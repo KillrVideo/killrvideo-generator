@@ -2,9 +2,12 @@
   "name": "killrvideo-generator",
   "version": "0.0.0",
   "description": "Sample Data generator for KillrVideo",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node dist/index.js",
+    "clean": "rimraf dist",
+    "build": "babel src --out-dir dist --source-maps",
+    "watch": "npm-run-all clean \"build -- --watch\""
   },
   "repository": {
     "type": "git",
@@ -16,5 +19,21 @@
     "url": "https://github.com/KillrVideo/killrvideo-generator/issues"
   },
   "homepage": "https://github.com/KillrVideo/killrvideo-generator#readme",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "bluebird": "^3.4.0",
+    "cassandra-driver": "^3.0.2",
+    "grpc": "^0.14.1",
+    "simple-get": "^2.1.0",
+    "uuid": "^2.0.2",
+    "winston": "^2.2.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.9.0",
+    "babel-plugin-transform-es2015-destructuring": "^6.9.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.8.0",
+    "babel-plugin-transform-es2015-parameters": "^6.9.0",
+    "npm-run-all": "^2.1.1",
+    "rimraf": "^2.5.2"
+  }
 }
