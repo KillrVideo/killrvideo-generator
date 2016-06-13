@@ -26,6 +26,7 @@
   "dependencies": {
     "bluebird": "^3.4.0",
     "killrvideo-nodejs-common": "https://github.com/KillrVideo/killrvideo-nodejs-common/releases/download/v1.0.1/killrvideo-nodejs-common-1.0.1.tgz",
+    "later": "^1.2.0",
     "uuid": "^2.0.2"
   },
   "devDependencies": {
