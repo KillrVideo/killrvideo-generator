@@ -28,6 +28,10 @@ export class Scheduler {
         this._runningTasks = taskExecutors;
         logger.log('info', 'Started scheduler');
         this._running = true;
+
+        // Return null so bluebird doesn't warn about any promises created by task.start() potentially
+        // being runaway promises
+        return null;
       })
       .catch(err => {
         // Use console to synchronously log the error to make sure it makes it to the console
