@@ -1,8 +1,14 @@
+import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
+import { STATS_SERVICE } from '../services/stats';
+
 /**
  * Adds a view to a video.
  */
 export function addSampleVideoView() {
-  throw new Error('Not implemented');
+  return getGrpcClientAsync(STATS_SERVICE)
+    .then(client => {
+      throw new Error('Not implemented');
+    });
 };
 
 export default addSampleVideoView;
