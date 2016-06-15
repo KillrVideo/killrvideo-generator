@@ -14,3 +14,7 @@ node_modules
 
 # Docker compose environment
 /.env
+
+# Environment-specific config
+config/local.yaml
+config/production.yaml

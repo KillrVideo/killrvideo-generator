@@ -1,0 +1,9 @@
+# Key required for calling YouTube APIs
+youTubeApiKey: REPLACE_WITH_YOUR_KEY
+
+# Cassandra settings
+cassandra:
+  # The keyspace (will be created if it doesn't exist)
+  keyspace: killrvideo_sample_data
+  # The replication string (i.e. after WITH REPLICATION) to use when creating the keyspace if it doesn't exist
+  replication: "{ 'class' : 'SimpleStrategy', 'replication_factor' : 1 }"

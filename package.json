@@ -26,6 +26,7 @@
   "private": true,
   "dependencies": {
     "bluebird": "^3.4.0",
+    "config": "^1.21.0",
     "googleapis": "^8.2.0",
     "js-yaml": "^3.6.1",
     "killrvideo-nodejs-common": "https://github.com/KillrVideo/killrvideo-nodejs-common/releases/download/v1.0.1/killrvideo-nodejs-common-1.0.1.tgz",
