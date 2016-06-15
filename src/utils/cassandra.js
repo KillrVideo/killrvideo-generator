@@ -44,9 +44,22 @@ function getCassandraConfig() {
  * Create the tables if they don't already exist.
  */
 function createTablesAsync(client) {
-  // Run each CQL statement in the schema array one at a time
-  return Promise.mapSeries(schema, cql => client.executeAsync(cql));
+  // Run each CQL statement in the schema array one at a time and then return the client
+  return Promise.mapSeries(schema, cql => client.executeAsync(cql)).return(client);
 }
+
+// Singleton client instance for app
+let clientInstance = null;
+
+/**
+ * Get a Cassandra client instance.
+ */
+export function getCassandraClient() {
+  if (clientInstance == null) {
+    throw new Error('No client instance found. Did you forget to call initCassandraAsync?');
+  }
+  return clientInstance;
+};
 
 /**
  * Initializes the Cassandra keyspace and schema needed.
@@ -56,6 +69,7 @@ export function initCassandraAsync() {
     .then(config => createKeyspaceIfNotExistsAsync(config.keyspace, config.replication).return(config))
     .then(config => getCassandraClientAsync(config.keyspace))
     .then(createTablesAsync)
+    .tap(client => { clientInstance = client; })
     .catch(err => {
       logger.log('verbose', err.message);
       throw err;
