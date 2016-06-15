@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "start:dev": "cross-env NODE_ENV=development node -r dotenv/config dist/index.js",
+    "start:dev": "cross-env NODE_ENV=development node --debug -r dotenv/config dist/index.js",
     "clean": "rimraf dist",
     "build": "npm-run-all --parallel \"build:*\"",
     "build:js": "babel src --out-dir dist --source-maps",
@@ -26,6 +26,7 @@
   "private": true,
   "dependencies": {
     "bluebird": "^3.4.0",
+    "googleapis": "^8.2.0",
     "js-yaml": "^3.6.1",
     "killrvideo-nodejs-common": "https://github.com/KillrVideo/killrvideo-nodejs-common/releases/download/v1.0.1/killrvideo-nodejs-common-1.0.1.tgz",
     "later": "^1.2.0",
