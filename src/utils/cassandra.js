@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import config from 'config';
 import { logger, createKeyspaceIfNotExistsAsync, getCassandraClientAsync } from 'killrvideo-nodejs-common';
 
 /**
@@ -32,12 +33,10 @@ const schema = [
   ) WITH CLUSTERING ORDER BY (published_at DESC, youtube_video_id ASC);`
 ];
 
-// TODO: Temporarily hardcoded these settings
+// Get cassandra configuration options
 function getCassandraConfig() {
-  return {
-    keyspace: 'killrvideo_sample_data',
-    replication: "{ 'class' : 'SimpleStrategy', 'replication_factor' : 1 }"
-  };
+  const { keyspace, replication } = config.get('cassandra');
+  return { keyspace, replication };
 }
 
 /**
