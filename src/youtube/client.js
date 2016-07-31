@@ -1,5 +1,6 @@
 import { youtube } from 'googleapis';
 import config from 'config';
+import Promise from 'bluebird';
 
 // Shared client instance
 let client = null;

@@ -13,7 +13,7 @@ const INSERT_VIDEO_CQL = 'INSERT INTO youtube_videos (sourceid, published_at, yo
 async function getLatestVideoDateAsync(sourceId){
   let cass = getCassandraClient();
   let result = await cass.executeAsync('SELECT published_at FROM youtube_videos WHERE sourceid = ? LIMIT 1', [ sourceId ]);
-  return result.rowLength === 1 ? result.first().published_at : new Date();
+  return result.rowLength === 1 ? result.first().published_at : new Date(0);
 }
 
 /**
@@ -22,7 +22,7 @@ async function getLatestVideoDateAsync(sourceId){
 function getPublishedAt(snippet) {
   return snippet.hasOwnProperty('publishedAt')
     ? new Date(snippet.publishedAt)
-    : new Date();
+    : new Date(0);
 }
 
 /**
@@ -54,7 +54,7 @@ export async function refreshChannelAsync(sourceId, channelId) {
     }
 
     // Get some search results
-    let searchResults = await client.search.listAsync(listRequest);
+    let searchResults = await youtube.search.listAsync(listRequest);
 
     // Iterate over the results and insert appropriate records
     for (let searchResult of searchResults.items) {
@@ -110,10 +110,10 @@ export async function refreshKeywordSearchAsync(sourceId, searchTerms) {
     }
 
     // Get some search results
-    let searchResults = await client.search.listAsync(listRequest);
+    let searchResults = await youtube.search.listAsync(listRequest);
 
     // Iterate search results and insert videos
-    for (let searchResult of searchResults) {
+    for (let searchResult of searchResults.items) {
       // Do we have enough?
       if (inserts.length >= MAX_VIDEOS_PER_REFRESH) {
         getMoreVideos = false;
@@ -163,10 +163,10 @@ export async function refreshPlaylistAsync(sourceId, playlistId) {
     }
 
     // Get some search results
-    let searchResults = await client.playlistItems.listAsync(listRequest);
+    let searchResults = await youtube.playlistItems.listAsync(listRequest);
 
     // Iterate over search results and insert
-    for (let searchResult of searchResults) {
+    for (let searchResult of searchResults.items) {
       // Do we have enough videos?
       if (inserts.length >= MAX_VIDEOS_PER_REFRESH) {
         getMoreVideos = false;

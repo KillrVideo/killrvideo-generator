@@ -1,4 +1,6 @@
 import * as RefreshSourceOptions from './refresh';
+import { withRetries, logger } from 'killrvideo-nodejs-common';
+import Promise from 'bluebird';
 
 // Tags that might apply to more than one YouTube source
 const globalTags = [
@@ -47,4 +49,22 @@ export const YouTubeVideoSources = {
   MOVIE_TRAILERS: createChannelSource('MOVIE_TRAILERS', 'UCi8e0iOVk1fEOogdfu4YgfA', [ 'movie', 'trailer', 'preview' ]),
   SNL: createChannelSource('SNL', 'UCqFzWxSCi39LnW1JKFR3efg', [ 'snl', 'saturday night live', 'comedy' ]),
   KEY_AND_PEELE: createPlaylistSource('KEY_AND_PEELE', 'PL83DDC2327BEB616D', [ 'key and peele', 'comedy' ])
+};
+
+/**
+ * Refresh all the available YouTube video sources.
+ */
+export async function refreshAllSourcesAsync() {
+  let promises = Object.keys(YouTubeVideoSources).map(sourceName => {
+    logger.log('verbose', `Refreshing YouTube source ${sourceName}`);
+    
+    let source = YouTubeVideoSources[sourceName];
+    return withRetries(source.refreshAsync, 10, 2, `Error refreshing YouTube source ${sourceName}`, true);
+  });
+
+  try {
+    await Promise.all(promises);
+  } catch (err) {
+    logger.log('error', 'At least one YouTube source failed to refresh', err);
+  }
 };

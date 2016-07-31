@@ -63,14 +63,15 @@ export function getCassandraClient() {
 /**
  * Initializes the Cassandra keyspace and schema needed.
  */
-export function initCassandraAsync() { 
-  return Promise.try(getCassandraConfig)
-    .then(config => createKeyspaceIfNotExistsAsync(config.keyspace, config.replication).return(config))
-    .then(config => getCassandraClientAsync(config.keyspace))
-    .then(createTablesAsync)
-    .tap(client => { clientInstance = client; })
-    .catch(err => {
-      logger.log('verbose', err.message);
-      throw err;
-    });
+export async function initCassandraAsync() {
+  // Create keyspace
+  let config = getCassandraConfig();
+  await createKeyspaceIfNotExistsAsync(config.keyspace, config.replication);
+
+  // Create tables
+  let client = await getCassandraClientAsync(config.keyspace);
+  await createTablesAsync(client);
+
+  // Save client instance
+  clientInstance = client;
 };
