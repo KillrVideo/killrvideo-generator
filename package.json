@@ -31,10 +31,12 @@
     "js-yaml": "^3.6.1",
     "killrvideo-nodejs-common": "https://github.com/KillrVideo/killrvideo-nodejs-common/releases/download/v1.0.1/killrvideo-nodejs-common-1.0.1.tgz",
     "later": "^1.2.0",
+    "regenerator-runtime": "^0.9.5",
     "uuid": "^2.0.2"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
+    "babel-plugin-transform-async-to-module-method": "^6.8.0",
     "babel-plugin-transform-es2015-destructuring": "^6.9.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.8.0",
     "babel-plugin-transform-es2015-parameters": "^6.9.0",

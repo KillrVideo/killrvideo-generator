@@ -20,7 +20,7 @@ function startScheduler() {
 let startPromise = withRetries(initCassandraAsync, 10, 10, 'Could not initialize Cassandra keyspace', false)
   .then(startScheduler)
   .catch(err => {
-    console.error('Unable to start KillrVideo Web Server');
+    console.error('Unable to start Sample Data Generator');
     console.error(err);
     process.exitCode = 1;
   });
