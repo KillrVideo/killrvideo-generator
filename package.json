@@ -25,12 +25,12 @@
   "homepage": "https://github.com/KillrVideo/killrvideo-generator#readme",
   "private": true,
   "dependencies": {
-    "bluebird": "^3.4.0",
+    "bluebird": "^3.4.1",
     "config": "^1.21.0",
     "faker": "^3.1.0",
-    "googleapis": "^8.2.0",
+    "googleapis": "^12.0.0",
     "js-yaml": "^3.6.1",
-    "killrvideo-nodejs-common": "https://github.com/KillrVideo/killrvideo-nodejs-common/releases/download/v1.0.1/killrvideo-nodejs-common-1.0.1.tgz",
+    "killrvideo-nodejs-common": "https://github.com/KillrVideo/killrvideo-nodejs-common/releases/download/v1.1.0/killrvideo-nodejs-common-1.1.0.tgz",
     "later": "^1.2.0",
     "regenerator-runtime": "^0.9.5",
     "uuid": "^2.0.2"
