@@ -21,7 +21,7 @@ async function startAsync() {
     await withRetries(initCassandraAsync, 10, 10, 'Could not initialize Cassandra keyspace', false);
 
     // Initialize sample data
-    await initializeSampleDataAsync();
+    await withRetries(initializeSampleDataAsync, 10, 10, 'Could not initialize sample data', false);
 
     // Start scheduled tasks
     scheduler = new Scheduler(availableTasks);
