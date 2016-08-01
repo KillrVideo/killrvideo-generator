@@ -1,8 +1,7 @@
-import { getCassandraClient } from './cassandra';
 import uuid from 'uuid';
 import { random } from 'faker';
+import { getCassandraClient } from '../utils/cassandra';
 import { YouTubeVideoSources } from '../youtube/sources';
-
 
 /**
  * Gets a random sample user's Id. Returns null if none are available.

@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import { random } from 'faker';
 import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
 import { RATINGS_SERVICE } from '../services/ratings';
-import { getSampleUserIdAsync, getSampleVideoIdAsync } from '../utils/get-sample-data';
+import { getSampleUserIdAsync, getSampleVideoIdAsync } from '../sample-data/get-sample-data';
 import { stringToUuid } from '../utils/protobuf-conversions';
 
 /**

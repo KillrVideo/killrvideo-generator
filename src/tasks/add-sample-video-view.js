@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
 import { STATS_SERVICE } from '../services/stats';
-import { getSampleVideoIdAsync } from '../utils/get-sample-data';
+import { getSampleVideoIdAsync } from '../sample-data/get-sample-data';
 import { stringToUuid } from '../utils/protobuf-conversions';
 
 /**

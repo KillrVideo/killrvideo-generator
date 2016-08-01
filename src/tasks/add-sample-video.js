@@ -2,8 +2,7 @@ import Promise from 'bluebird';
 import uuid from 'uuid';
 import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
 import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
-import { getUnusedYouTubeVideoAsync } from '../utils/get-sample-data';
-import { getSampleUserIdAsync } from '../utils/get-sample-data';
+import { getSampleUserIdAsync, getUnusedYouTubeVideoAsync } from '../sample-data/get-sample-data';
 import { stringToUuid } from '../utils/protobuf-conversions';
 
 /**

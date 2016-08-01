@@ -3,7 +3,7 @@ import { lorem, random } from 'faker';
 import uuid from 'uuid';
 import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
 import { COMMENTS_SERVICE } from '../services/comments';
-import { getSampleUserIdAsync, getSampleVideoIdAsync } from '../utils/get-sample-data';
+import { getSampleUserIdAsync, getSampleVideoIdAsync } from '../sample-data/get-sample-data';
 import { stringToUuid } from '../utils/protobuf-conversions';
 
 /**
