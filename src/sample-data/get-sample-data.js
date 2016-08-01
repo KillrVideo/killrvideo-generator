@@ -26,7 +26,7 @@ export async function getSampleUserIdAsync() {
 
   return resultsToUse === null
     ? null
-    : resultsToUse.first().userid;
+    : resultsToUse.first().userid.toString();
 };
 
 /**
@@ -51,7 +51,7 @@ export async function getSampleVideoIdAsync() {
 
   return resultsToUse === null
     ? null
-    : resultsToUse.first().videoid;
+    : resultsToUse.first().videoid.toString();
 };
 
 /**
@@ -97,16 +97,17 @@ function mapRowAndSourceToYouTubeVideo(row, source) {
  */
 async function consumeUnusedVideoAsync(source) {
   // Use the source's id to get a page of records
-  let pageSate = null;
+  let pageState = null;
+  let cass = getCassandraClient();
   do {
     let queryOpts = pageState === null ? {} : { pageState };
-    let resultSet = await client.executeAsync('SELECT * FROM youtube_videos WHERE sourceid = ?', [ source.sourceId ], queryOpts);
+    let resultSet = await cass.executeAsync('SELECT * FROM youtube_videos WHERE sourceid = ?', [ source.sourceId ], queryOpts);
 
     // Try to find an unused video in the rows returned
     let row = resultSet.rows.find(r => r.used !== true);
     if (row) {
       // Mark the video as used
-      await client.executeAsync(
+      await cass.executeAsync(
         'UPDATE youtube_videos SET used = true WHERE sourceid = ? AND published_at = ? AND youtube_video_id = ?',
         [ source.sourceId, row.published_at, row.youtube_video_id ]);
       
@@ -131,7 +132,7 @@ export async function getUnusedYouTubeVideoAsync() {
   let sources = Object.keys(YouTubeVideoSources).map(k => YouTubeVideoSources[k]);
   let startIdx = random.number({ min: 0, max: sources.length - 1 });
 
-  for (let i = startidx; i < sources.length + startIdx; i++) {
+  for (let i = startIdx; i < sources.length + startIdx; i++) {
     // Get the current source
     let idx = i % sources.length;
     let source = sources[idx];
