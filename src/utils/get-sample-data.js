@@ -1,5 +1,8 @@
 import { getCassandraClient } from './cassandra';
 import uuid from 'uuid';
+import { random } from 'faker';
+import { YouTubeVideoSources } from '../youtube/sources';
+
 
 /**
  * Gets a random sample user's Id. Returns null if none are available.
@@ -51,3 +54,80 @@ export async function getSampleVideoIdAsync() {
     : resultsToUse.first().videoid;
 };
 
+/**
+ * Helper function that takes a row from C* and a YouTube video source and returns an object
+ * that represents the YouTube video.
+ */
+function mapRowAndSourceToYouTubeVideo(row, source) {
+  // Start with data in the row
+  let video = {
+    publishedAt: row.published_at,
+    youTubeVideoId: row.youtube_video_id,
+    name: row.name,
+    description: row.description
+  };
+
+  // Try to assign some tags from the source to the video
+  let tags = [];
+  let maxTags = random.number({ min: 3, max: 6 });
+
+  // Look for source's tags in the video's name or description
+  let lowerName = video.name.toLowerCase();
+  let lowerDescription = video.description.toLowerCase();
+  for (let possibleTag of source.allTags) {
+    if (lowerName.indexOf(possibleTag) > -1 || lowerDescription.indexOf(possibleTag) > -1) {
+      tags.push(possibleTag);
+    }
+
+    if (tags.length === maxTags) break;
+  }
+
+  // If we didn't get any tags, just add some random ones from the source's tags list
+  if (tags.count === 0) {
+    Array.prototype.push.apply(tags, source.sourceTags.slice(0, maxTags));
+  }
+
+  video.tags = tags;
+  return video;
+}
+
+/**
+ * Gets an unused YouTube video from available sources, marks it as used, and returns it. Returns
+ * null if no unused videos are found.
+ */
+export async function getUnusedYouTubeVideoAsync() {
+  let cass = getCassandraClient();
+
+  // Walk sources starting from a random index
+  let sources = Object.keys(YouTubeVideoSources).map(k => YouTubeVideoSources[k]);
+  let startIdx = random.number({ min: 0, max: sources.length - 1 });
+
+  for (let i = startidx; i < sources.length + startIdx; i++) {
+    // Get the current source
+    let idx = i % sources.length;
+    let source = sources[idx];
+
+    // Use the source's id to get a page of records
+    let pageSate = null;
+    do {
+      let queryOpts = pageState === null ? {} : { pageState };
+      let resultSet = await client.executeAsync('SELECT * FROM youtube_videos WHERE sourceid = ?', [ source.sourceId ], queryOpts);
+
+      // Try to find an unused video in the rows returned
+      let row = resultSet.rows.find(r => r.used !== true);
+      if (row) {
+        // Mark the video as used
+        await client.executeAsync(
+          'UPDATE youtube_videos SET used = true WHERE sourceid = ? AND published_at = ? AND youtube_video_id = ?',
+          [ source.sourceId, row.published_at, row.youtube_video_id ]);
+        
+        return mapRowAndSourceToYouTubeVideo(row, source);
+      }
+
+      // Set page state for next query
+      pageState = resultSet.pageState;
+    } while (pageState)
+  }
+
+  return null;
+};

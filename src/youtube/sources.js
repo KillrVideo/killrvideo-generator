@@ -8,12 +8,12 @@ const globalTags = [
   'internet of things', 'time series', 'data model'
 ];
 
-function createSource(sourceId, tags, refreshAsync) {
+function createSource(sourceId, sourceTags, refreshAsync) {
   // Combine the tags provided with the global tags to come up with a final list
-  Array.prototype.push.apply(tags, globalTags);
+  let allTags = [ ...sourceTags, ...globalTags ];
   
   // Return the object
-  return { sourceId, tags, refreshAsync };
+  return { sourceId, sourceTags, allTags, refreshAsync };
 }
 
 function createChannelSource(sourceId, channelId, tags) {
