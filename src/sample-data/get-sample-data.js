@@ -91,6 +91,10 @@ function mapRowAndSourceToYouTubeVideo(row, source) {
   return video;
 }
 
+// Cache of videos we're currently attempting to mark as used (this is just a rough attempt at preventing
+// duplicate videos being added when we're adding a bunch in parallel like on initial load)
+let consumingCache = {};
+
 /**
  * Tries to find an unused video for the given source, mark it as used and returns it. Returns null if an
  * unused video can't be found.
@@ -104,14 +108,22 @@ async function consumeUnusedVideoAsync(source) {
     let resultSet = await cass.executeAsync('SELECT * FROM youtube_videos WHERE sourceid = ?', [ source.sourceId ], queryOpts);
 
     // Try to find an unused video in the rows returned
-    let row = resultSet.rows.find(r => r.used !== true);
-    if (row) {
-      // Mark the video as used
-      await cass.executeAsync(
-        'UPDATE youtube_videos SET used = true WHERE sourceid = ? AND published_at = ? AND youtube_video_id = ?',
-        [ source.sourceId, row.published_at, row.youtube_video_id ]);
-      
-      return mapRowAndSourceToYouTubeVideo(row, source);
+    for (let row of resultSet.rows) {
+      let cacheKey = row.youtube_video_id;
+
+      // If the row hasn't been marked as used and isn't currently being consumed by some other task
+      if (row.used !== true && consumingCache.hasOwnProperty(cacheKey) === false) {
+        // Add to cache so another task doesn't try and use it while we're marking it as used
+        consumingCache[cacheKey] = true;
+        await cass.executeAsync(
+          'UPDATE youtube_videos SET used = true WHERE sourceid = ? AND published_at = ? AND youtube_video_id = ?',
+          [ source.sourceId, row.published_at, row.youtube_video_id ]);
+
+        // Delete from the cache in a minute
+        setTimeout(() => delete consumingCache[cacheKey], 60000);
+
+        return mapRowAndSourceToYouTubeVideo(row, source);
+      }
     }
 
     // Set page state for next query
