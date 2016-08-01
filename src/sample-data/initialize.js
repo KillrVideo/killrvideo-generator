@@ -1,8 +1,11 @@
 import Promise from 'bluebird';
-import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
+import { getGrpcClientAsync, logger } from 'killrvideo-nodejs-common';
 import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';
 import { getSampleUserIdAsync, getSampleVideoIdAsync } from './get-sample-data';
 import { addSampleUser, addSampleVideo } from '../tasks';
+
+const INITIAL_USERS = 10;
+const INITIAL_VIDEOS = 10;
 
 /**
  * Makes sure there is a base level of sample data available. Meant to be run before
@@ -18,18 +21,22 @@ export async function initializeSampleDataAsync() {
   let shouldAddUsers = userId === null;
   let shouldAddVideos = videoId === null;
 
-  // If we don't have any sample users yet, add 10 initial users
+  // If we don't have any sample users yet, add initial users
   if (shouldAddUsers) {
+    logger.log('verbose', `Adding ${INITIAL_USERS} initial sample users`);
+
     let userPromises = [];
-    while (userPromises.length < 10) {
+    while (userPromises.length < INITIAL_USERS) {
       userPromises.push(addSampleUser());
     }
 
     await Promise.all(userPromises);
   }
 
-  // If we don't have any sample videos yet, add 10 initial videos 
+  // If we don't have any sample videos yet, add initial videos 
   if (shouldAddVideos) {
+    logger.log('verbose', `Adding ${INITIAL_VIDEOS} initial sample videos`);
+
     let videoPromises = [];
     while (videoPromises.length < 10) {
       videoPromises.push(addSampleVideo());
@@ -42,11 +49,13 @@ export async function initializeSampleDataAsync() {
   // so the UI home page isn't blank
   if (!shouldAddVideos) {
     let client = await getGrpcClientAsync(VIDEO_CATALOG_SERVICE);
-    let latestVideos = await client.getLatestVideoPreviewsAsync({ pageSize: 10 });
+    let latestVideos = await client.getLatestVideoPreviewsAsync({ pageSize: INITIAL_VIDEOS });
 
-    // If we don't have at least 10 latest videos, add some videos
-    let videosToAdd = latestVideos.videoPreviews.length - 10;
+    // If we don't have latest videos, add some videos
+    let videosToAdd = latestVideos.videoPreviews.length - INITIAL_VIDEOS;
     if (videosToAdd > 0) {
+      logger.log('verbose', `Adding ${videosToAdd} sample videos`);
+      
       let videoPromises = [];
       while (videoPromises.length < videosToAdd) {
         videoPromises.push(addSampleVideo());

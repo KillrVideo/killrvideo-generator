@@ -1,5 +1,6 @@
 import uuid from 'uuid';
 import { random } from 'faker';
+import { logger } from 'killrvideo-nodejs-common';
 import { getCassandraClient } from '../utils/cassandra';
 import { YouTubeVideoSources } from '../youtube/sources';
 
@@ -91,8 +92,37 @@ function mapRowAndSourceToYouTubeVideo(row, source) {
 }
 
 /**
- * Gets an unused YouTube video from available sources, marks it as used, and returns it. Returns
- * null if no unused videos are found.
+ * Tries to find an unused video for the given source, mark it as used and returns it. Returns null if an
+ * unused video can't be found.
+ */
+async function consumeUnusedVideoAsync(source) {
+  // Use the source's id to get a page of records
+  let pageSate = null;
+  do {
+    let queryOpts = pageState === null ? {} : { pageState };
+    let resultSet = await client.executeAsync('SELECT * FROM youtube_videos WHERE sourceid = ?', [ source.sourceId ], queryOpts);
+
+    // Try to find an unused video in the rows returned
+    let row = resultSet.rows.find(r => r.used !== true);
+    if (row) {
+      // Mark the video as used
+      await client.executeAsync(
+        'UPDATE youtube_videos SET used = true WHERE sourceid = ? AND published_at = ? AND youtube_video_id = ?',
+        [ source.sourceId, row.published_at, row.youtube_video_id ]);
+      
+      return mapRowAndSourceToYouTubeVideo(row, source);
+    }
+
+    // Set page state for next query
+    pageState = resultSet.pageState;
+  } while (pageState);
+
+  return null;
+}
+
+/**
+ * Gets an unused YouTube video from available sources, marks it as used, and returns it. Returns null
+ * if one cannot be found.
  */
 export async function getUnusedYouTubeVideoAsync() {
   let cass = getCassandraClient();
@@ -106,27 +136,19 @@ export async function getUnusedYouTubeVideoAsync() {
     let idx = i % sources.length;
     let source = sources[idx];
 
-    // Use the source's id to get a page of records
-    let pageSate = null;
-    do {
-      let queryOpts = pageState === null ? {} : { pageState };
-      let resultSet = await client.executeAsync('SELECT * FROM youtube_videos WHERE sourceid = ?', [ source.sourceId ], queryOpts);
+    // Try to get an unused video
+    let video = await consumeUnusedVideoAsync(source);
+    if (video !== null) return video;
 
-      // Try to find an unused video in the rows returned
-      let row = resultSet.rows.find(r => r.used !== true);
-      if (row) {
-        // Mark the video as used
-        await client.executeAsync(
-          'UPDATE youtube_videos SET used = true WHERE sourceid = ? AND published_at = ? AND youtube_video_id = ?',
-          [ source.sourceId, row.published_at, row.youtube_video_id ]);
-        
-        return mapRowAndSourceToYouTubeVideo(row, source);
-      }
+    // We failed, so refresh the source and try again
+    logger.log('verbose', `Refreshing YouTube video source ${source.sourceId}`);
+    await source.refreshAsync();
+    video = await consumeUnusedVideoAsync(source);
+    if (video !== null) return video;
 
-      // Set page state for next query
-      pageState = resultSet.pageState;
-    } while (pageState)
+    // Log a warning that the video source is out of videos and go to next source
+    logger.log('warn', `YouTube video source ${source.sourceId} is exhausted`);
   }
 
-  return null;
+  throw new Error('Unable to find an unused YouTube video');
 };

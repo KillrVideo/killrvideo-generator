@@ -5,7 +5,6 @@ import { withRetries } from 'killrvideo-nodejs-common';
 import { Scheduler } from './scheduler';
 import * as availableTasks from './tasks';
 import { initCassandraAsync } from './utils/cassandra';
-import { refreshAllSourcesAsync } from './youtube/sources';
 import { initializeSampleDataAsync } from './sample-data/initialize';
 
 // Allow promise cancellation
@@ -23,9 +22,6 @@ async function startAsync() {
 
     // Initialize sample data
     await initializeSampleDataAsync();
-
-    // Refresh YouTube data sources
-    await refreshAllSourcesAsync();
 
     // Start scheduled tasks
     scheduler = new Scheduler(availableTasks);

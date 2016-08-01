@@ -50,21 +50,3 @@ export const YouTubeVideoSources = {
   SNL: createChannelSource('SNL', 'UCqFzWxSCi39LnW1JKFR3efg', [ 'snl', 'saturday night live', 'comedy' ]),
   KEY_AND_PEELE: createPlaylistSource('KEY_AND_PEELE', 'PL83DDC2327BEB616D', [ 'key and peele', 'comedy' ])
 };
-
-/**
- * Refresh all the available YouTube video sources.
- */
-export async function refreshAllSourcesAsync() {
-  let promises = Object.keys(YouTubeVideoSources).map(sourceName => {
-    logger.log('verbose', `Refreshing YouTube source ${sourceName}`);
-    
-    let source = YouTubeVideoSources[sourceName];
-    return withRetries(source.refreshAsync, 10, 2, `Error refreshing YouTube source ${sourceName}`, true);
-  });
-
-  try {
-    await Promise.all(promises);
-  } catch (err) {
-    logger.log('error', 'At least one YouTube source failed to refresh', err);
-  }
-};
