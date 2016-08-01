@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import uuid from 'uuid';
 import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
-import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
+import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';
 import { getSampleUserIdAsync, getUnusedYouTubeVideoAsync } from '../sample-data/get-sample-data';
 import { stringToUuid } from '../utils/protobuf-conversions';
 import { getCassandraClient } from '../utils/cassandra';

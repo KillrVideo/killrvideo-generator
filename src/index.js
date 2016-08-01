@@ -6,6 +6,7 @@ import { Scheduler } from './scheduler';
 import * as availableTasks from './tasks';
 import { initCassandraAsync } from './utils/cassandra';
 import { refreshAllSourcesAsync } from './youtube/sources';
+import { initializeSampleDataAsync } from './sample-data/initialize';
 
 // Allow promise cancellation
 Promise.config({ cancellation: true });
@@ -19,6 +20,9 @@ async function startAsync() {
   try {
     // Make sure C* is ready to go
     await withRetries(initCassandraAsync, 10, 10, 'Could not initialize Cassandra keyspace', false);
+
+    // Initialize sample data
+    await initializeSampleDataAsync();
 
     // Refresh YouTube data sources
     await refreshAllSourcesAsync();
