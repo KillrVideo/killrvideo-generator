@@ -25,10 +25,56 @@ function getPublishedAt(snippet) {
     : new Date(0);
 }
 
+// A private cache of currently running refresh Promises
+const refreshCache = {};
+
 /**
  * Refresh the videos for a channel source.
  */
-export async function refreshChannelAsync(sourceId, channelId) {
+export function refreshChannelAsync(sourceId, channelId) {
+  if (refreshCache.hasOwnProperty(sourceId)) {
+    return refreshCache[sourceId];
+  }
+
+  let promise = _refreshChannelAsync(sourceId, channelId)
+    .finally(() => delete refreshCache[sourceId]);
+
+  refreshCache[sourceId] = promise;
+  return promise;
+};
+
+/**
+ * Refresh the videos for a keyword search source.
+ */
+export function refreshKeywordSearchAsync(sourceId, searchTerms) {
+  if (refreshCache.hasOwnProperty(sourceId)) {
+    return refreshCache[sourceId];
+  }
+
+  let promise = _refreshKeywordSearchAsync(sourceId, searchTerms)
+    .finally(() => delete refreshCache[sourceId]);
+
+  refreshCache[sourceId] = promise;
+  return promise;
+};
+
+/**
+ * Refresh the videos for a playlist source.
+ */
+export function refreshPlaylistAsync(sourceId, playlistId) {
+  if (refreshCache.hasOwnProperty(sourceId)) {
+    return refreshCache[sourceId];
+  }
+
+  let promise = _refreshPlaylistAsync(sourceId, playlistId)
+    .finally(() => delete refreshCache[sourceId]);
+
+  refreshCache[sourceId] = promise;
+  return promise;
+};
+
+// Does the actual work refreshing a channel
+async function _refreshChannelAsync(sourceId, channelId) {
   // Find latest date of video we already know about for the source
   let latestDate = await getLatestVideoDateAsync(sourceId);
 
@@ -86,10 +132,8 @@ export async function refreshChannelAsync(sourceId, channelId) {
   await Promise.all(inserts);
 };
 
-/**
- * Refresh the videos for a keyword search source.
- */
-export async function refreshKeywordSearchAsync(sourceId, searchTerms) {
+// Does the actual work refreshing a keyword search source
+async function _refreshKeywordSearchAsync(sourceId, searchTerms) {
   let getMoreVideos = true;
   let nextPageToken = null;
   let inserts = [];
@@ -140,10 +184,8 @@ export async function refreshKeywordSearchAsync(sourceId, searchTerms) {
   await Promise.all(inserts);
 };
 
-/**
- * Refresh the videos for a playlist source.
- */
-export async function refreshPlaylistAsync(sourceId, playlistId) {
+// Does the actual work refreshing a playlist
+async function _refreshPlaylistAsync(sourceId, playlistId) {
   let getMoreVideos = true;
   let nextPageToken = null;
   let inserts = [];
