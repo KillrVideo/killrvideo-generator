@@ -32,7 +32,7 @@ async function startAsync() {
 
     console.error('Unable to start Sample Data Generator');
     console.error(err);
-    process.exitCode = 1;
+    process.exit(1);
   }
 }
 
