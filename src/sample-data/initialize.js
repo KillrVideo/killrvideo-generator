@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import { getGrpcClientAsync, logger } from 'killrvideo-nodejs-common';
+import { getGrpcClientAsync, logger, whenAll } from 'killrvideo-nodejs-common';
 import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';
 import { getSampleUserIdAsync, getSampleVideoIdAsync } from './get-sample-data';
 import { addSampleUser, addSampleVideo } from '../tasks';
@@ -30,7 +30,7 @@ export async function initializeSampleDataAsync() {
       userPromises.push(addSampleUser());
     }
 
-    await Promise.all(userPromises);
+    await whenAll(userPromises);
   }
 
   // If we don't have any sample videos yet, add initial videos 
@@ -42,7 +42,7 @@ export async function initializeSampleDataAsync() {
       videoPromises.push(addSampleVideo());
     }
 
-    await Promise.all(videoPromises);
+    await whenAll(videoPromises);
   }
 
   // If we already had sample videos, also make sure that we have some latest videos available
@@ -61,7 +61,7 @@ export async function initializeSampleDataAsync() {
         videoPromises.push(addSampleVideo());
       }
 
-      await Promise.all(videoPromises);
+      await whenAll(videoPromises);
     }
   }
 };

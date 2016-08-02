@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import uuid from 'uuid';
-import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
+import { getGrpcClientAsync, whenAll } from 'killrvideo-nodejs-common';
 import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';
 import { getSampleUserIdAsync, getUnusedYouTubeVideoAsync, markYouTubeVideoUsedAsync } from '../sample-data/get-sample-data';
 import { stringToUuid } from '../utils/protobuf-conversions';
@@ -35,7 +35,7 @@ export async function addSampleVideo() {
 
   // Mark the YouTube video as used and save video Id to cassandra to use in future same data generation
   let cass = getCassandraClient();
-  await Promise.all([
+  await whenAll([
     markYouTubeVideoUsedAsync(),
     cass.executeAsync('INSERT INTO videos (videoid) VALUES (?)', [ videoId ])
   ]);
