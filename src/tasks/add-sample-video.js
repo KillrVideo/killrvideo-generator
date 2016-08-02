@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import uuid from 'uuid';
 import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
 import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';
-import { getSampleUserIdAsync, getUnusedYouTubeVideoAsync } from '../sample-data/get-sample-data';
+import { getSampleUserIdAsync, getUnusedYouTubeVideoAsync, markYouTubeVideoUsedAsync } from '../sample-data/get-sample-data';
 import { stringToUuid } from '../utils/protobuf-conversions';
 import { getCassandraClient } from '../utils/cassandra';
 
@@ -17,7 +17,6 @@ export async function addSampleVideo() {
     getSampleUserIdAsync()
   ]);
 
-  if (video === null) throw new Error('No unused YouTube videos available');
   if (userId === null) throw new Error('No sample users available');
   
   let videoId = uuid.v4();
@@ -34,9 +33,12 @@ export async function addSampleVideo() {
 
   await client.submitYouTubeVideoAsync(request);
 
-  // Save the video Id to Cassandra so we can use it for future sample data generation
+  // Mark the YouTube video as used and save video Id to cassandra to use in future same data generation
   let cass = getCassandraClient();
-  await cass.executeAsync('INSERT INTO videos (videoid) VALUES (?)', [ videoId ]);
+  await Promise.all([
+    markYouTubeVideoUsedAsync(),
+    cass.executeAsync('INSERT INTO videos (videoid) VALUES (?)', [ videoId ])
+  ]);
 };
 
 export default addSampleVideo;

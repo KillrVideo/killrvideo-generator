@@ -1,3 +1,4 @@
+import Promsie from 'bluebird';
 import uuid from 'uuid';
 import { random } from 'faker';
 import { logger } from 'killrvideo-nodejs-common';
@@ -61,6 +62,7 @@ export async function getSampleVideoIdAsync() {
 function mapRowAndSourceToYouTubeVideo(row, source) {
   // Start with data in the row
   let video = {
+    sourceId: source.sourceId,
     publishedAt: row.published_at,
     youTubeVideoId: row.youtube_video_id,
     name: row.name,
@@ -93,13 +95,13 @@ function mapRowAndSourceToYouTubeVideo(row, source) {
 
 // Cache of videos we're currently attempting to mark as used (this is just a rough attempt at preventing
 // duplicate videos being added when we're adding a bunch in parallel like on initial load)
-let consumingCache = {};
+let inUseCache = {};
 
 /**
- * Tries to find an unused video for the given source, mark it as used and returns it. Returns null if an
- * unused video can't be found.
+ * Tries to find an unused video for the given source and returns it. Returns null if an unused video can't
+ * be found.
  */
-async function consumeUnusedVideoAsync(source) {
+async function _getUnusedYouTubeVideoAsync(source) {
   // Use the source's id to get a page of records
   let pageState = null;
   let cass = getCassandraClient();
@@ -112,16 +114,9 @@ async function consumeUnusedVideoAsync(source) {
       let cacheKey = row.youtube_video_id;
 
       // If the row hasn't been marked as used and isn't currently being consumed by some other task
-      if (row.used !== true && consumingCache.hasOwnProperty(cacheKey) === false) {
-        // Add to cache so another task doesn't try and use it while we're marking it as used
-        consumingCache[cacheKey] = true;
-        await cass.executeAsync(
-          'UPDATE youtube_videos SET used = true WHERE sourceid = ? AND published_at = ? AND youtube_video_id = ?',
-          [ source.sourceId, row.published_at, row.youtube_video_id ]);
-
-        // Delete from the cache in a minute
-        setTimeout(() => delete consumingCache[cacheKey], 60000);
-
+      if (row.used !== true && inUseCache.hasOwnProperty(cacheKey) === false) {
+        // Add to cache so another task doesn't try and use it while we're using it
+        inUseCache[cacheKey] = Promise.delay(60000).then(() => delete inUseCache[cacheKey]);
         return mapRowAndSourceToYouTubeVideo(row, source);
       }
     }
@@ -164,4 +159,14 @@ export async function getUnusedYouTubeVideoAsync() {
   }
 
   throw new Error('Unable to find an unused YouTube video');
+};
+
+/**
+ * Marks a sample YouTube video as used.
+ */
+export function markYouTubeVideoUsedAsync(video) {
+  let cass = getCassandraClient();
+  return cass.executeAsync(
+    'UPDATE youtube_videos SET used = true WHERE sourceid = ? AND published_at = ? AND youtube_video_id = ?',
+    [ video.sourceId, video.publishedAt, video.youtubeVideoId ]);
 };
