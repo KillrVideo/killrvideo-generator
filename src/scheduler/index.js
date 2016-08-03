@@ -1,5 +1,5 @@
 import { logger } from 'killrvideo-nodejs-common';
-import { loadSchedulesAsync } from './load-schedules';
+import { loadSchedules } from './load-schedules';
 import { createTaskExecutors } from './task-executor';
 
 export class Scheduler {
@@ -11,7 +11,6 @@ export class Scheduler {
     this._availableTasks = availableTasks;
 
     this._running = false;
-    this._initPromise = null;
     this._runningTasks = null;
   }
 
@@ -21,24 +20,14 @@ export class Scheduler {
     }
 
     logger.log('info', 'Starting scheduler');
-    this._initPromise = loadSchedulesAsync()
-      .then(scheduledTasks => {
-        let taskExecutors = createTaskExecutors(this._availableTasks, scheduledTasks);
-        taskExecutors.forEach(t => t.start());
-        this._runningTasks = taskExecutors;
-        logger.log('info', 'Started scheduler');
-        this._running = true;
+    
+    let scheduledTasks = loadSchedules();
+    let taskExecutors = createTaskExecutors(this._availableTasks, scheduledTasks);
+    taskExecutors.forEach(t => t.start());
+    this._runningTasks = taskExecutors;
 
-        // Return null so bluebird doesn't warn about any promises created by task.start() potentially
-        // being runaway promises
-        return null;
-      })
-      .catch(err => {
-        // Use console to synchronously log the error to make sure it makes it to the console
-        console.error('Failed to start the scheduler');
-        console.error(err);
-        process.exitCode = 1;
-      });
+    logger.log('info', 'Started scheduler');
+    this._running = true;
   }
 
   stop() {
@@ -48,16 +37,12 @@ export class Scheduler {
 
     logger.log('info', 'Stopping scheduler');
 
-    // Cancel init if still in progress
-    this._initPromise.cancel();
-
     // Stop any running tasks
     if (this._runningTasks !== null) {
       this._runningTasks.forEach(t => t.stop());
     }
 
     // Reset state
-    this._initPromise = null;
     this._runningTasks = null;
 
     logger.log('info', 'Stopped scheduler');

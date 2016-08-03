@@ -8,4 +8,23 @@ cassandra:
   # The replication string (i.e. after WITH REPLICATION) to use when creating the keyspace if it doesn't exist
   replication: "{ 'class' : 'SimpleStrategy', 'replication_factor' : 1 }"
 
+# The minimum log level to output
 loggingLevel: verbose
+
+# Default schedules for running tasks, parsed by Later.js text parser
+# (see http://bunkat.github.io/later/parsers.html#text for examples)
+schedules:
+  addSampleComment:
+  - every 1 minute
+
+  addSampleRating:
+  - every 20 seconds
+
+  addSampleUser:
+  - every 30 minutes
+
+  addSampleVideo:
+  - every 8 hours
+
+  addSampleVideoView:
+  - every 1 seconds
