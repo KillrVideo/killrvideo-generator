@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import { getGrpcClientAsync, logger, whenAll } from 'killrvideo-nodejs-common';
+import { getGrpcClientAsync, waitForClientReadyAsync, logger, whenAll } from 'killrvideo-nodejs-common';
 import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';
 import { getSampleUserIdAsync, getSampleVideoIdAsync } from './get-sample-data';
 import { addSampleUser, addSampleVideo } from '../tasks';
@@ -12,6 +12,11 @@ const INITIAL_VIDEOS = 10;
  * the scheduler starts adding sample data on a schedule.
  */
 export async function initializeSampleDataAsync() {
+  // Get the video catalog service client and wait til the service is ready before proceeding
+  let client = await getGrpcClientAsync(VIDEO_CATALOG_SERVICE);
+  logger.log('verbose', 'Waiting for services to be ready');
+  await waitForClientReadyAsync(client, Infinity);
+
   // See if we have sample user/video ids available to tasks
   let [ userId, videoId ] = await Promise.all([
     getSampleUserIdAsync(),
@@ -48,7 +53,7 @@ export async function initializeSampleDataAsync() {
   // If we already had sample videos, also make sure that we have some latest videos available
   // so the UI home page isn't blank
   if (!shouldAddVideos) {
-    let client = await getGrpcClientAsync(VIDEO_CATALOG_SERVICE);
+    
     let latestVideos = await client.getLatestVideoPreviewsAsync({ pageSize: INITIAL_VIDEOS });
 
     // If we don't have latest videos, add some videos

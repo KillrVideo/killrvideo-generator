@@ -1,4 +1,4 @@
-import Promsie from 'bluebird';
+import Promise from 'bluebird';
 import uuid from 'uuid';
 import { random } from 'faker';
 import { logger } from 'killrvideo-nodejs-common';
@@ -145,13 +145,13 @@ export async function getUnusedYouTubeVideoAsync() {
     let source = sources[idx];
 
     // Try to get an unused video
-    let video = await consumeUnusedVideoAsync(source);
+    let video = await _getUnusedYouTubeVideoAsync(source);
     if (video !== null) return video;
 
     // We failed, so refresh the source and try again
     logger.log('verbose', `Refreshing YouTube video source ${source.sourceId}`);
     await source.refreshAsync();
-    video = await consumeUnusedVideoAsync(source);
+    video = await _getUnusedYouTubeVideoAsync(source);
     if (video !== null) return video;
 
     // Log a warning that the video source is out of videos and go to next source

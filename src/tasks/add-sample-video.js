@@ -36,7 +36,7 @@ export async function addSampleVideo() {
   // Mark the YouTube video as used and save video Id to cassandra to use in future same data generation
   let cass = getCassandraClient();
   await whenAll([
-    markYouTubeVideoUsedAsync(),
+    markYouTubeVideoUsedAsync(video),
     cass.executeAsync('INSERT INTO videos (videoid) VALUES (?)', [ videoId ])
   ]);
 };
