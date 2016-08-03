@@ -30,7 +30,7 @@
     "faker": "^3.1.0",
     "googleapis": "^12.0.0",
     "js-yaml": "^3.6.1",
-    "killrvideo-nodejs-common": "https://github.com/KillrVideo/killrvideo-nodejs-common/releases/download/v1.3.2/killrvideo-nodejs-common-1.3.2.tgz",
+    "killrvideo-nodejs-common": "https://github.com/KillrVideo/killrvideo-nodejs-common/releases/download/v1.3.5/killrvideo-nodejs-common-1.3.5.tgz",
     "later": "^1.2.0",
     "regenerator-runtime": "^0.9.5",
     "uuid": "^2.0.2"
