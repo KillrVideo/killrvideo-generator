@@ -1,5 +1,6 @@
+import EventEmitter from 'events';
 import Promise from 'bluebird';
-import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
+import { getGrpcClientAsync, logger } from 'killrvideo-nodejs-common';
 import { getClientChannel } from 'grpc';
 import grpc from 'grpc/src/node/src/grpc_extension.js';
 import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';
@@ -25,26 +26,34 @@ export const AvailableStates = {
  */
 export class ServicesMonitor extends EventEmitter {
   constructor() {
+    super();
     this._runningPromise = null;
-    this._stopRequested = true;
-
-    this.currentState = AvailableStates.UNKNOWN;
+    this._currentState = null;
   }
 
+  /**
+   * Start listening to status and firing change events.
+   */
   start() {
-    this._stopRequested = false;
-    this._runningPromise = _run();
+    // Already started?
+    if (this._runningPromise !== null) return;
+
+    this._runningPromise = this._runAsync();
   }
 
+  /**
+   * Stop listening to status and firing change events.
+   */
   stop() {
+    // Already stopped?
     if (this._runningPromise === null) return;
 
-    this._stopRequested = true;
     this._runningPromise.cancel();
     this._runningPromise = null;
+    this._currentState = null;
   }
 
-  async _run() {
+  async _runAsync() {
     // Get client for Video Catalog
     let client = await getGrpcClientAsync(VIDEO_CATALOG_SERVICE);
 
@@ -56,9 +65,10 @@ export class ServicesMonitor extends EventEmitter {
     let nextState = channel.getConnectivityState(true);
     this._setCurrentState(nextState);
 
-    while(this._stopRequested === false) {
+    while (true) {
       // Watch and update state property on changes (passing along the last Grpc state we've seen and a deadline)
-      nextState = await watchConnectivityStateAsync(nextState, Infinity);
+      await watchConnectivityStateAsync(nextState, Infinity);
+      nextState = channel.getConnectivityState(true);
       this._setCurrentState(nextState);
     }
   }
@@ -82,8 +92,12 @@ export class ServicesMonitor extends EventEmitter {
         throw new Error(`Unhandled grpc state ${newState}`);
     }
 
+    logger.log('debug', `Got grpc state ${newState}, setting state ${s}`);
+
     // Set and emit the event
-    this.currentState = s;
-    this.emit('change', s);
+    if (this._currentState !== s) {
+      this._currentState = s;
+      this.emit('change', s);
+    }
   }
 }

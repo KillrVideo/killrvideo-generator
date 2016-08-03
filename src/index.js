@@ -5,7 +5,6 @@ import { setLogger } from 'grpc';
 import { withRetries, setLoggingLevel, logger } from 'killrvideo-nodejs-common';
 import { Scheduler } from './scheduler';
 import { initCassandraAsync } from './utils/cassandra';
-import { initializeSampleDataAsync } from './sample-data/initialize';
 
 // Allow promise cancellation
 Promise.config({ cancellation: true });
@@ -31,9 +30,6 @@ async function startAsync() {
   try {
     // Make sure C* is ready to go
     await withRetries(initCassandraAsync, 10, 10, 'Could not initialize Cassandra keyspace', false);
-
-    // Initialize sample data
-    await withRetries(initializeSampleDataAsync, 10, 10, 'Could not initialize sample data', false);
 
     // Start scheduled tasks
     scheduler = new Scheduler();
