@@ -3,7 +3,6 @@ import process from 'process';
 import config from 'config';
 import { withRetries, setLoggingLevel, logger } from 'killrvideo-nodejs-common';
 import { Scheduler } from './scheduler';
-import * as availableTasks from './tasks';
 import { initCassandraAsync } from './utils/cassandra';
 import { initializeSampleDataAsync } from './sample-data/initialize';
 
@@ -29,7 +28,7 @@ async function startAsync() {
     await withRetries(initializeSampleDataAsync, 10, 10, 'Could not initialize sample data', false);
 
     // Start scheduled tasks
-    scheduler = new Scheduler(availableTasks);
+    scheduler = new Scheduler();
     scheduler.start();
     return scheduler;
   } catch (err) {

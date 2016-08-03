@@ -53,7 +53,6 @@ export async function initializeSampleDataAsync() {
   // If we already had sample videos, also make sure that we have some latest videos available
   // so the UI home page isn't blank
   if (!shouldAddVideos) {
-    
     let latestVideos = await client.getLatestVideoPreviewsAsync({ pageSize: INITIAL_VIDEOS });
 
     // If we don't have latest videos, add some videos

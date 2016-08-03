@@ -3,13 +3,7 @@ import { loadSchedules } from './load-schedules';
 import { createTaskExecutors } from './task-executor';
 
 export class Scheduler {
-  constructor(availableTasks) {
-    if (!availableTasks) {
-      throw new Error('No tasks supplied');
-    }
-
-    this._availableTasks = availableTasks;
-
+  constructor() {
     this._running = false;
     this._runningTasks = null;
   }
@@ -22,7 +16,7 @@ export class Scheduler {
     logger.log('info', 'Starting scheduler');
     
     let scheduledTasks = loadSchedules();
-    let taskExecutors = createTaskExecutors(this._availableTasks, scheduledTasks);
+    let taskExecutors = createTaskExecutors(scheduledTasks);
     taskExecutors.forEach(t => t.start());
     this._runningTasks = taskExecutors;
 

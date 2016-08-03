@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import { setTimeout as setScheduledTimeout } from 'later';
 import { withRetries, logger } from 'killrvideo-nodejs-common';
+import * as availableTasks from '../tasks';
 
 /**
  * Create a promise that will resolve at the next scheduled run time of a given later.js schedule.
@@ -55,7 +56,7 @@ export class TaskExecutor {
  * Given an object with available tasks and an object with task schedules, creates TaskExecutor objects
  * for each scheduled task and returns the array.
  */
-export function createTaskExecutors(availableTasks, scheduledTasks) {
+export function createTaskExecutors(scheduledTasks) {
   // Reduce list of scheduled tasks down to an array of TaskExecutor objects
   return Object.keys(scheduledTasks).reduce((acc, taskName) => {
     // Make sure we know how to execute the task (i.e. we have a function for it)
