@@ -1,11 +1,14 @@
 import Promise from 'bluebird';
-import { getGrpcClientAsync, waitForClientReadyAsync, logger, whenAll } from 'killrvideo-nodejs-common';
+import { waitForClientReady } from 'grpc';
+import { getGrpcClientAsync, logger, whenAll } from 'killrvideo-nodejs-common';
 import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';
 import { getSampleUserIdAsync, getSampleVideoIdAsync } from './get-sample-data';
 import { addSampleUser, addSampleVideo } from '../tasks';
 
 const INITIAL_USERS = 10;
 const INITIAL_VIDEOS = 10;
+
+const waitForClientReadyAsync = Promise.promisify(waitForClientReady);
 
 /**
  * Makes sure there is a base level of sample data available. Meant to be run before

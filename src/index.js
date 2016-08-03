@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import process from 'process';
 import config from 'config';
+import { setLogger } from 'grpc';
 import { withRetries, setLoggingLevel, logger } from 'killrvideo-nodejs-common';
 import { Scheduler } from './scheduler';
 import { initCassandraAsync } from './utils/cassandra';
@@ -9,15 +10,22 @@ import { initializeSampleDataAsync } from './sample-data/initialize';
 // Allow promise cancellation
 Promise.config({ cancellation: true });
 
-// Set default logging level based on config
-let loggingLevel = config.get('loggingLevel');
-setLoggingLevel(loggingLevel);
-logger.log(loggingLevel, `Logging initialized at ${loggingLevel}`);
-
 /**
  * Async start the application.
  */
 async function startAsync() {
+  // Set default logging level based on config
+  let loggingLevel = config.get('loggingLevel');
+  setLoggingLevel(loggingLevel);
+  logger.log(loggingLevel, `Logging initialized at ${loggingLevel}`);
+
+  // Set Grpc to log via main logger with all messages at debug level
+  setLogger({
+    error(msg) {
+      logger.log('debug', msg);
+    }
+  });
+
   let scheduler = null;
 
   try {
