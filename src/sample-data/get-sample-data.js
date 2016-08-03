@@ -149,7 +149,6 @@ export async function getUnusedYouTubeVideoAsync() {
     if (video !== null) return video;
 
     // We failed, so refresh the source and try again
-    logger.log('verbose', `Refreshing YouTube video source ${source.sourceId}`);
     await source.refreshAsync();
     video = await _getUnusedYouTubeVideoAsync(source);
     if (video !== null) return video;
@@ -168,5 +167,5 @@ export function markYouTubeVideoUsedAsync(video) {
   let cass = getCassandraClient();
   return cass.executeAsync(
     'UPDATE youtube_videos SET used = true WHERE sourceid = ? AND published_at = ? AND youtube_video_id = ?',
-    [ video.sourceId, video.publishedAt, video.youtubeVideoId ]);
+    [ video.sourceId, video.publishedAt, video.youTubeVideoId ]);
 };

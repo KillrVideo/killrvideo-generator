@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import { logger } from 'killrvideo-nodejs-common';
 import { getYouTubeClient } from './client';
 import { getCassandraClient } from '../utils/cassandra';
 
@@ -35,7 +36,8 @@ export function refreshChannelAsync(sourceId, channelId) {
   if (refreshCache.hasOwnProperty(sourceId)) {
     return refreshCache[sourceId];
   }
-
+  
+  logger.log('verbose', `Refreshing YouTube video source ${sourceId}`);
   let promise = _refreshChannelAsync(sourceId, channelId)
     .finally(() => delete refreshCache[sourceId]);
 
@@ -51,6 +53,7 @@ export function refreshKeywordSearchAsync(sourceId, searchTerms) {
     return refreshCache[sourceId];
   }
 
+  logger.log('verbose', `Refreshing YouTube video source ${sourceId}`);
   let promise = _refreshKeywordSearchAsync(sourceId, searchTerms)
     .finally(() => delete refreshCache[sourceId]);
 
@@ -66,6 +69,7 @@ export function refreshPlaylistAsync(sourceId, playlistId) {
     return refreshCache[sourceId];
   }
 
+  logger.log('verbose', `Refreshing YouTube video source ${sourceId}`);
   let promise = _refreshPlaylistAsync(sourceId, playlistId)
     .finally(() => delete refreshCache[sourceId]);
 
