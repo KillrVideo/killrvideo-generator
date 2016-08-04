@@ -1,8 +1,10 @@
 import Promise from 'bluebird';
-import { logger } from 'killrvideo-nodejs-common';
+import { setTimeout as setScheduledTimeout } from 'later';
+import { logger, whenAll, AggregateError } from 'killrvideo-nodejs-common';
 import { loadSchedules } from './load-schedules';
-import { createTaskExecutors } from './task-executor';
 import { ServicesMonitor, AvailableStates } from './services-monitor';
+import { initializeSampleDataAsync } from '../sample-data/initialize';
+import * as availableTasks from '../tasks';
 
 export class Scheduler {
   constructor() {
@@ -72,11 +74,64 @@ export class Scheduler {
   }
 
   async _runAsync() {
+    // Run forever and allow stop via Promise cancellation
     while (true) {
-      logger.log('verbose', 'SCHEDULED TASK');
+      try {
+        // Make sure we've got initial sample data before we start tasks
+        await initializeSampleDataAsync();
+
+        // Load all the schedules
+        let schedules = loadSchedules();
+
+        // Run scheduled tasks
+        let taskPromises = Object.keys(schedules).reduce((acc, taskName) => {
+          schedules[taskName].forEach(schedule => {
+            acc.push(this._runTaskAsync(taskName, schedule));
+          })
+          return acc;
+        }, []);
+
+        await whenAll(taskPromises);
+      } catch (err) {
+        logger.log('error', '', err);
+        if (err instanceof AggregateError) {
+          logger.log('error', 'Inner errors:');
+          err.innerErrors.forEach(innerErr => logger.log('error', '', innerErr));
+        }
+      }
+
+      // Wait before trying again
       await Promise.delay(10000);
     }
   }
+
+  async _runTaskAsync(taskName, schedule) {
+    // Run forever until cancelled
+    while (true) {
+      try {
+        await createSchedulePromise(schedule);
+        let taskFn = availableTasks[taskName];
+        if (!taskFn) {
+          throw new Error(`No available task named ${taskName} was found.`);
+        }
+        await taskFn();
+        logger.log('debug', `Ran ${taskName}`);
+      } catch (err) {
+        logger.log('error', `Error while running task ${taskName}.`, err);
+      }
+    }
+  }
 };
+
+/**
+ * Create a promise that will resolve at the next scheduled run time of a given later.js schedule.
+ */
+function createSchedulePromise(schedule) {
+  // Use onCancel handler to support cancellation while we're waiting for the timeout
+  return new Promise(function resolveOnSchedule(resolve, reject, onCancel) {
+    let timer = setScheduledTimeout(resolve, schedule);
+    onCancel(() => timer.clear());
+  });
+}
 
 export default Scheduler;
