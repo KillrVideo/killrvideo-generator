@@ -1,0 +1,30 @@
+language: node_js
+node_js:
+  - "6"
+
+# Just run the build script in package.json
+script:
+  - npm run build
+
+# Sudo required for doing docker build
+sudo: required
+services:
+  - docker
+
+env:
+  global:
+    # Needed to compile native modules
+    - CXX=g++-4.8
+
+# Also needed to compile native modules
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+
+# Cache node_modules between builds to try and speed things up
+cache:
+  directories:
+    - node_modules
