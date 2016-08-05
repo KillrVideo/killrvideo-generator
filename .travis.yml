@@ -2,9 +2,10 @@ language: node_js
 node_js:
   - "6"
 
-# Just run the build script in package.json
+# Build the app and a docker image
 script:
   - npm run build
+  - ./scripts/docker-build.sh
 
 # Sudo required for doing docker build
 sudo: required
