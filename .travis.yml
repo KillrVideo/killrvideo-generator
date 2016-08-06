@@ -7,6 +7,10 @@ script:
   - npm run build
   - ./scripts/docker-build.sh
 
+# If successful, see if we need to publish also
+after_success:
+  - ./scripts/travis-publish.sh
+
 # Sudo required for doing docker build
 sudo: required
 services:
