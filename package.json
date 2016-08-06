@@ -11,7 +11,8 @@
     "build:js": "babel src --out-dir dist --source-maps",
     "build:protos": "cpx \"lib/killrvideo-service-protos/src/**\" dist/protos --verbose",
     "build:googleprotos": "cpx \"lib/google/**\" dist/protos/google --verbose",
-    "watch": "npm-run-all clean --parallel \"build:* -- --watch\""
+    "watch": "npm-run-all clean --parallel \"build:* -- --watch\"",
+    "postversion": "git push --follow-tags"
   },
   "repository": {
     "type": "git",
