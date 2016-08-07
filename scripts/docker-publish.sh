@@ -9,7 +9,7 @@ DOCKER_IMAGE=luketillman/killrvideo-generator
 
 # Allow git describe to fail (which it will if this isn't a tagged commit)
 set +e 
-CURRENT_TAG=`git describe --tags 2> /dev/null`
+CURRENT_TAG=`git describe --tags --exact-match 2> /dev/null`
 
 set -e # Exit with nonzero exit code if anything fails
 
