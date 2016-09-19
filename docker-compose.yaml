@@ -1,0 +1,3 @@
+# No services specific to this project, instead just uses base services defined
+# in .\lib\killrvideo-docker-common\docker-compose.yaml 
+version: '2'
