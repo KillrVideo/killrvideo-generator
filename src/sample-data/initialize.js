@@ -1,6 +1,8 @@
 import Promise from 'bluebird';
 import { waitForClientReady } from 'grpc';
-import { getGrpcClientAsync, logger, whenAll } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
+import { whenAll } from '../utils/promises';
+import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
 import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';
 import { getSampleUserIdAsync, getSampleVideoIdAsync } from './get-sample-data';
 import { addSampleUser, addSampleVideo } from '../tasks';

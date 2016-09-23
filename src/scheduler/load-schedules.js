@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import config from 'config';
 import { parse } from 'later';
-import { logger } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
 
 /**
  * Loads and parses the schedules from config. Returns an object with task names as the keys and an array 

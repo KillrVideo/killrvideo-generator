@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import uuid from 'uuid';
 import { random } from 'faker';
-import { logger } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
 import { getCassandraClient } from '../utils/cassandra';
 import { YouTubeVideoSources } from '../youtube/sources';
 

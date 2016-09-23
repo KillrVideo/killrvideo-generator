@@ -2,7 +2,8 @@ import Promise from 'bluebird';
 import process from 'process';
 import config from 'config';
 import { setLogger } from 'grpc';
-import { withRetries, setLoggingLevel, logger } from 'killrvideo-nodejs-common';
+import { withRetries } from './utils/promises';  
+import { setLoggingLevel, logger } from './utils/logging';
 import { Scheduler } from './scheduler';
 import { initCassandraAsync } from './utils/cassandra';
 

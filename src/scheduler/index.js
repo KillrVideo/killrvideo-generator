@@ -1,6 +1,8 @@
 import Promise from 'bluebird';
 import { setTimeout as setScheduledTimeout } from 'later';
-import { logger, whenAll, AggregateError } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
+import { whenAll } from '../utils/promises';
+import { AggregateError } from '../utils/aggregate-error';
 import { loadSchedules } from './load-schedules';
 import { ServicesMonitor, AvailableStates } from './services-monitor';
 import { initializeSampleDataAsync } from '../sample-data/initialize';

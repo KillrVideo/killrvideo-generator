@@ -1,5 +1,6 @@
 import * as RefreshSourceOptions from './refresh';
-import { withRetries, logger } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
+import { withRetries } from '../utils/promises';
 import Promise from 'bluebird';
 
 // Tags that might apply to more than one YouTube source

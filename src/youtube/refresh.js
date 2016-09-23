@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import { logger } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
 import { getYouTubeClient } from './client';
 import { getCassandraClient } from '../utils/cassandra';
 
