@@ -40,9 +40,13 @@ There is a developer task included in the `package.json` scripts. You can run th
 ```
 > npm run watch
 ```
-This will clean, do a build, and then watch and recompile source files on change. If using VS
-Code for development, the tasks checked into the repo under `/.vscode` should allow you to
-start the program with debugging using `F5`.
+This will clean, do a build, and then watch and recompile source files on change. The main
+entrypoint for the app will be `/dist/index.js` after the build which you can start with or
+without a debugger attached. Source maps for the transpiled code are next to the output files
+in `/dist`.
+
+If using VS Code for development, the tasks checked into the repo under `/.vscode` should 
+allow you to start the program with debugging using `F5`.
 
 ## Releasing
 
