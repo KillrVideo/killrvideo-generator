@@ -55,7 +55,7 @@ export async function initializeSampleDataAsync() {
     let latestVideos = await client.getLatestVideoPreviewsAsync({ pageSize: INITIAL_VIDEOS });
 
     // If we don't have latest videos, add some videos
-    let videosToAdd = latestVideos.videoPreviews.length - INITIAL_VIDEOS;
+    let videosToAdd = INITIAL_VIDEOS - latestVideos.videoPreviews.length;
     if (videosToAdd > 0) {
       logger.log('verbose', `Adding ${videosToAdd} sample videos`);
       
