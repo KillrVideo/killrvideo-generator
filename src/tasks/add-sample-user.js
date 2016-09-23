@@ -1,6 +1,6 @@
 import uuid from 'uuid';
 import { internet, name, random } from 'faker';
-import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
+import { getGrpcClientAsync } from '../utils/grpc-client';
 import { USER_MANAGEMENT_SERVICE } from '../services/user-management';
 import { stringToUuid } from '../utils/protobuf-conversions';
 import { getCassandraClient } from '../utils/cassandra';

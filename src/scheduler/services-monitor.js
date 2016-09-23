@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import Promise from 'bluebird';
 import { logger } from '../utils/logging';
-import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
+import { getGrpcClientAsync } from '../utils/grpc-client';
 import { getClientChannel } from 'grpc';
 import grpc from 'grpc/src/node/src/grpc_extension.js';
 import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';

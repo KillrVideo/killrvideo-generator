@@ -2508,6 +2508,11 @@
       "from": "signal-exit@>=3.0.0 <4.0.0",
       "resolved": "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.1.tgz"
     },
+    "simple-get": {
+      "version": "2.2.2",
+      "from": "simple-get@latest",
+      "resolved": "https://registry.npmjs.org/simple-get/-/simple-get-2.2.2.tgz"
+    },
     "slash": {
       "version": "1.0.0",
       "from": "slash@>=1.0.0 <2.0.0",
@@ -2671,6 +2676,11 @@
       "version": "0.0.6",
       "from": "typedarray@>=0.0.5 <0.1.0",
       "resolved": "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
+    },
+    "unzip-response": {
+      "version": "1.0.1",
+      "from": "unzip-response@>=1.0.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/unzip-response/-/unzip-response-1.0.1.tgz"
     },
     "url": {
       "version": "0.11.0",

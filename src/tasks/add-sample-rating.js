@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import { random } from 'faker';
-import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
+import { getGrpcClientAsync } from '../utils/grpc-client';
 import { RATINGS_SERVICE } from '../services/ratings';
 import { getSampleUserIdAsync, getSampleVideoIdAsync } from '../sample-data/get-sample-data';
 import { stringToUuid } from '../utils/protobuf-conversions';

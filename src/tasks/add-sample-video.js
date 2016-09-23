@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import uuid from 'uuid';
 import { whenAll } from '../utils/promises';
-import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
+import { getGrpcClientAsync } from '../utils/grpc-client';
 import { VIDEO_CATALOG_SERVICE } from '../services/video-catalog';
 import { getSampleUserIdAsync, getUnusedYouTubeVideoAsync, markYouTubeVideoUsedAsync } from '../sample-data/get-sample-data';
 import { stringToUuid } from '../utils/protobuf-conversions';
