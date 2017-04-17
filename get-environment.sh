@@ -7,7 +7,7 @@ set -e  # Bail if something fails
 # for example, create a .env file for use with docker-compose 
 
 # TODO: Determine if a Docker Toolbox setup
-IS_TOOLBOX=true
+IS_TOOLBOX=false
 
 if [ "$IS_TOOLBOX" = true ]; then
     # Make sure default docker machine is started
@@ -25,7 +25,8 @@ if [ "$IS_TOOLBOX" = true ]; then
     # Just use the command that comes with docker-machine
     DOCKER_IP=$(docker-machine ip)
 else
-    DOCKER_IP="TODO: Docker for Mac VM IP"
+    # The create-environment.sh script should have setup a loopback alias, so use that IP
+    DOCKER_IP=$LOOPBACK_IP
 fi
 
 # Get the docker VM Host's IP address
@@ -35,7 +36,8 @@ if [ "$IS_TOOLBOX" = true ]; then
     # Remove suffix
     HOST_IP=${HOST_IP//\/[[:digit:]][[:digit:]]/}
 else
-    HOST_IP="TODO: Docker for Mac Host IP"
+    # The create-environment.sh script should have setup a loopback alias, so use that IP
+    HOST_IP=$LOOPBACK_IP
 fi
 
 # Write values to stdout
