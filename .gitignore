@@ -18,3 +18,6 @@ node_modules
 # Environment-specific config
 config/local.yaml
 config/production.yaml
+
+# Webstorm/IDEA
+.idea/
