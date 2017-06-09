@@ -4,6 +4,8 @@ import { Client, types as CassandraTypes } from 'cassandra-driver';
 import { logger } from './logging';
 import { lookupServiceAsync } from './lookup-service';
 
+//const dse = require('dse-driver');
+
 /**
  * An array of CQL table strings to use for the schema.
  */
@@ -56,6 +58,7 @@ export function getCassandraClientAsync(keyspace) {
     .then(contactPoints => {
       let clientOpts = {
         contactPoints,
+        //authProvider: new dse.auth.DsePlainTextAuthProvider("cassandra", "cassandra"), 
         queryOptions: { 
           prepare: true,
           consistency: CassandraTypes.consistencies.localQuorum
