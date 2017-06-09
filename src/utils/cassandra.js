@@ -4,7 +4,7 @@ import { Client, types as CassandraTypes } from 'dse-driver';
 import { logger } from './logging';
 import { lookupServiceAsync } from './lookup-service';
 
-//const dse = require('dse-driver');
+const dse = require('dse-driver');
 
 /**
  * An array of CQL table strings to use for the schema.
