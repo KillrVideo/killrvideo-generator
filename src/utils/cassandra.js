@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import config from 'config';
-import { Client, types as CassandraTypes } from 'cassandra-driver';
+import { Client, types as CassandraTypes } from 'dse-driver';
 import { logger } from './logging';
 import { lookupServiceAsync } from './lookup-service';
 
@@ -58,7 +58,7 @@ export function getCassandraClientAsync(keyspace) {
     .then(contactPoints => {
       let clientOpts = {
         contactPoints,
-        //authProvider: new dse.auth.DsePlainTextAuthProvider("cassandra", "cassandra"), 
+        authProvider: new dse.auth.DsePlainTextAuthProvider("cassandra", "cassandra"), 
         queryOptions: { 
           prepare: true,
           consistency: CassandraTypes.consistencies.localQuorum
