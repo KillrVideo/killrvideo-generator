@@ -1,10 +1,8 @@
 import Promise from 'bluebird';
 import config from 'config';
-import { Client, types as CassandraTypes } from 'dse-driver';
+import { Client, auth, types as CassandraTypes } from 'dse-driver';
 import { logger } from './logging';
 import { lookupServiceAsync } from './lookup-service';
-
-const dse = require('dse-driver');
 
 /**
  * An array of CQL table strings to use for the schema.
@@ -39,8 +37,8 @@ const schema = [
 
 // Get cassandra configuration options
 function getCassandraConfig() {
-  const { keyspace, replication } = config.get('cassandra');
-  return { keyspace, replication };
+  const { keyspace, replication, dseUsername, dsePassword } = config.get('cassandra');
+  return { keyspace, replication, dseUsername, dsePassword };
 }
 
 // Client promises by keyspace
@@ -49,7 +47,7 @@ const clientPromises = new Map();
 /**
  * Gets a Cassandra client instance that is connected to the specified keyspace.
  */
-export function getCassandraClientAsync(keyspace) {
+export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
   if (clientPromises.has(keyspace)) {
     return clientPromises.get(keyspace);
   }
@@ -58,7 +56,6 @@ export function getCassandraClientAsync(keyspace) {
     .then(contactPoints => {
       let clientOpts = {
         contactPoints,
-        authProvider: new dse.auth.DsePlainTextAuthProvider("cassandra", "cassandra"), 
         queryOptions: { 
           prepare: true,
           consistency: CassandraTypes.consistencies.localQuorum
@@ -67,6 +64,22 @@ export function getCassandraClientAsync(keyspace) {
       
       if (keyspace) {
         clientOpts.keyspace = keyspace;
+      }
+
+       /** 
+       * Check for both KILLRVIDEO_DSE_USERNAME and KILLRVIDEO_DSE_PASSWORD environment
+       * variables.  If they both exist use the values set within them.  If not,
+       * use default values for authentication.
+       */
+      if (dseUsername && dsePassword) {
+        let passwordLength = dsePassword.length;
+        logger.info('Using supplied DSE username: "' + dseUsername + '" and password: "***' + dsePassword.substring(passwordLength - 4, passwordLength) + '" from environment variables')
+
+        // Use the values passed in from the config
+        clientOpts.authProvider = new auth.DsePlainTextAuthProvider(dseUsername, dsePassword);
+
+      } else {
+        logger.info('No detected username/password combination was passed in. DSE cluster authentication method was NOT executed.');
       }
       
       // Create a client and promisify it
@@ -89,12 +102,12 @@ export function getCassandraClientAsync(keyspace) {
  * Creates a keyspace in Cassandra if it doesn't already exist. Pass the name of the keyspace and the
  * string to be used as the REPLICATION setting (i.e. after WITH REPLIACTION = ...).
  */
-function createKeyspaceIfNotExistsAsync(keyspace, replication) {
+function createKeyspaceIfNotExistsAsync(keyspace, replication, dseUsername, dsePassword) {
   // Create CQL
   const cql = `CREATE KEYSPACE IF NOT EXISTS ${keyspace} WITH REPLICATION = ${replication}`;
   
   // Get a client, then create the keyspace
-  return getCassandraClientAsync().then(client => client.executeAsync(cql));
+  return getCassandraClientAsync(null, dseUsername, dsePassword).then(client => client.executeAsync(cql));
 };
 
 /**
@@ -124,10 +137,10 @@ export function getCassandraClient() {
 export async function initCassandraAsync() {
   // Create keyspace
   let config = getCassandraConfig();
-  await createKeyspaceIfNotExistsAsync(config.keyspace, config.replication);
+  await createKeyspaceIfNotExistsAsync(config.keyspace, config.replication, config.dseUsername, config.dsePassword);
 
   // Create tables
-  let client = await getCassandraClientAsync(config.keyspace);
+  let client = await getCassandraClientAsync(config.keyspace, config.dseUsername, config.dsePassword);
   await createTablesAsync(client);
 
   // Save client instance
