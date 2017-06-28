@@ -5,6 +5,7 @@
 			"name": "Launch",
 			"type": "node",
 			"request": "launch",
+			"protocol": "inspector",
 			"program": "${workspaceRoot}/src/index.js",
 			"stopOnEntry": false,
 			"args": [],
@@ -19,9 +20,9 @@
 			"env": {
 				"NODE_ENV": "development"
 			},
-			"console": "internalConsole",
+			"console": "integratedTerminal",
 			"sourceMaps": true,
-			"outDir": "${workspaceRoot}/dist"
+			"outFiles": ["${workspaceRoot}/dist/*"]
 		},
 		{
 			"name": "Attach",
@@ -31,7 +32,7 @@
 			"address": "localhost",
 			"restart": true,
 			"sourceMaps": true,
-			"outDir": "${workspaceRoot}\\dist",
+			"outFiles": ["${workspaceRoot}/dist/*"],
 			"localRoot": "${workspaceRoot}",
 			"remoteRoot": null
 		}

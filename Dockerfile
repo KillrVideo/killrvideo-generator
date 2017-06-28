@@ -1,4 +1,4 @@
-FROM node:6.3-slim
+FROM node:6.11-slim
 
 # Add killrvideo group and user
 RUN groupadd -r killrvideo --gid=999 \
@@ -15,6 +15,7 @@ WORKDIR /opt/killrvideo-generator
 
 # Copy package.json for dependencies
 COPY package.json /opt/killrvideo-generator/
+COPY npm-shrinkwrap.json /opt/killrvideo-generator/
     
 # Add dependencies for node-gyp, then run npm install and remove dependencies
 RUN set -x \
@@ -28,6 +29,7 @@ RUN set -x \
                         g++ \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Copy the app itself
 COPY . /opt/killrvideo-generator
