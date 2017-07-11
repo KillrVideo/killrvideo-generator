@@ -6,7 +6,7 @@ import Promise from 'bluebird';
 // Tags that might apply to more than one YouTube source
 const globalTags = [
   'asp.net', '.net', 'windows 10', 'c#', 'machine learning', 'big data', 'tutorial', 'beginner', 'mvc', 'roslyn', 'docker', 
-  'internet of things', 'time series', 'data model'
+  'internet of things', 'time series', 'data model', 'datastax'
 ];
 
 function createSource(sourceId, sourceTags, refreshAsync) {
@@ -39,6 +39,7 @@ export const YouTubeVideoSources = {
   // Tech-related sources
   PLANET_CASSANDRA: createChannelSource('PLANET_CASSANDRA', 'UCvP-AXuCr-naAeEccCfKwUA', [ 'cassandra', 'database', 'nosql' ]),
   DATASTAX_MEDIA: createChannelSource('DATASTAX_MEDIA', 'UCqA6zOSMpQ55vvguq4Y0jAg', [ 'datastax', 'cassandra', 'database', 'nosql' ]),
+  DATASTAX_ACADEMY: createChannelSource('DATASTAX_ACADEMY', 'UCAIQY251avaMv7bBv5PCo-A', [ 'datastax', 'course', 'trailer', 'roundtable', 'tutorial', 'intro', 'academy' ]),
   MICROSOFT_AZURE: createChannelSource('MICROSOFT_AZURE', 'UC0m-80FnNY2Qb7obvTL_2fA', [ 'microsoft', 'azure', 'cloud', 'windows', 'linux' ]),
   MICROSOFT_CLOUD_PLATFORM: createChannelSource('MICROSOFT_CLOUD_PLATFORM', 'UCSgzRJMqIiCNtoM6Q7Q9Lqw', [ 'microsoft', 'azure', 'cloud', 'windows', 'linux' ]),
   HANSELMAN: createChannelSource('HANSELMAN', 'UCL-fHOdarou-CR2XUmK48Og', [ 'microsoft', 'windows', 'linux', 'azure' ]),
