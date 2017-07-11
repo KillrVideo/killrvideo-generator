@@ -1,6 +1,6 @@
 {
   "name": "killrvideo-generator",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Sample Data generator for KillrVideo",
   "main": "dist/index.js",
   "scripts": {
