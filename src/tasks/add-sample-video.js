@@ -27,7 +27,7 @@ export async function addSampleVideo() {
     videoId: stringToUuid(videoId),
     userId: stringToUuid(userId),
     name: video.name,
-    description: video.description,
+    description: video.description ? video.description : "no description provided",
     tags: video.tags,
     youTubeVideoId: video.youTubeVideoId
   };
