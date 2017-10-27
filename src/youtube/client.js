@@ -1,6 +1,7 @@
 import { youtube } from 'googleapis';
 import config from 'config';
 import Promise from 'bluebird';
+import { logger } from '../utils/logging';
 
 // Shared client instance
 let client = null;
@@ -13,6 +14,7 @@ export function getYouTubeClient() {
 
   // Load API key and create client instance
   let auth = config.get('youTubeApiKey');
+  logger.log('verbose', `YouTube API Key: ${auth}`);
   let c = youtube({ version: 'v3', auth });
 
   // Promisify methods we need
