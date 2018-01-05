@@ -30,7 +30,7 @@ async function startAsync() {
 
   try {
     // Make sure C* is ready to go
-    await withRetries(initCassandraAsync, 10, 10, 'Could not initialize Cassandra keyspace', false);
+    await withRetries(initCassandraAsync, 20, 10, 'Could not initialize Cassandra keyspace', false);
 
     // Start scheduled tasks
     scheduler = new Scheduler();
