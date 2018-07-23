@@ -3,6 +3,7 @@ import config from 'config';
 import {auth, Client, types as CassandraTypes} from 'dse-driver';
 import {logger} from './logging';
 import {lookupServiceAsync} from './lookup-service';
+import {Filesystem} from 'fs'
 
 /**
  * An array of CQL table strings to use for the schema.
@@ -82,16 +83,14 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
         logger.info('No detected username/password combination was passed in. DSE cluster authentication method was NOT executed.');
       }
 
-      import {fs} from 'fs'
-
       let sslStat = process.env.KILLRVIDEO_ENABLE_SSL;
       logger.log('debug', sslStat);
 
       if (sslStat === "true") {
         logger.log('debug', 'SSL is configured to be on.');
-        if (fs.existsSync('cassandra.cert')) {
+        if (Filesystem.existsSync('cassandra.cert')) {
           clientOpts.sslOptions = {
-            ca: [fs.readFileSync('cassandra.cert')]
+            ca: [Filesystem.readFileSync('cassandra.cert')]
           };
           logger.log('debug', 'Found cert, read file sync.')
         } else {
