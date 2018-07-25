@@ -3,7 +3,6 @@ import config from 'config';
 import {auth, Client, types as CassandraTypes} from 'dse-driver';
 import {logger} from './logging';
 import {lookupServiceAsync} from './lookup-service';
-import {Filesystem} from 'fs'
 
 /**
  * An array of CQL table strings to use for the schema.
@@ -83,6 +82,7 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
         logger.info('No detected username/password combination was passed in. DSE cluster authentication method was NOT executed.');
       }
 
+      let Filesystem = require("fs");
       let sslStat = process.env.KILLRVIDEO_ENABLE_SSL;
       logger.info(sslStat);
 
