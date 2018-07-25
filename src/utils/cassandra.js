@@ -67,11 +67,11 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
         clientOpts.keyspace = keyspace;
       }
 
-       /** 
-       * Check for both KILLRVIDEO_DSE_USERNAME and KILLRVIDEO_DSE_PASSWORD environment
-       * variables.  If they both exist use the values set within them.  If not,
-       * use default values for authentication.
-       */
+      /**
+      * Check for both KILLRVIDEO_DSE_USERNAME and KILLRVIDEO_DSE_PASSWORD environment
+      * variables.  If they both exist use the values set within them.  If not,
+      * use default values for authentication.
+      */
       if (dseUsername && dsePassword) {
         let passwordLength = dsePassword.length;
         logger.info('Using supplied DSE username: "' + dseUsername + '" and password: "***' + dsePassword.substring(passwordLength - 4, passwordLength) + '" from environment variables');
@@ -84,22 +84,22 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
       }
 
       let sslStat = process.env.KILLRVIDEO_ENABLE_SSL;
-      logger.log('debug', sslStat);
+      logger.info(sslStat);
 
       if (sslStat === "true") {
-        logger.log('debug', 'SSL is configured to be on.');
+        logger.info('SSL is configured to be on.');
         if (Filesystem.existsSync('cassandra.cert')) {
           clientOpts.sslOptions = {
             ca: [Filesystem.readFileSync('cassandra.cert')]
           };
-          logger.log('debug', 'Found cert, read file sync.')
+          logger.info('Found cert, read file sync.')
         } else {
-          logger.log('debug', 'No cert found, SSL not enabled.')
+          logger.info('No cert found, SSL not enabled.')
         }
       } else if (sslStat === "false") {
-        logger.log('debug', 'SSL is configured to be off.')
+        logger.info('SSL is configured to be off.')
       } else {
-        logger.log('debug', 'SSL is not configured, should it be set?')
+        logger.info('SSL is not configured, should it be set?')
       }
 
       // Create a client and promisify it
