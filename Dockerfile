@@ -16,7 +16,7 @@ WORKDIR /opt/killrvideo-generator
 # Copy package.json for dependencies
 COPY package.json /opt/killrvideo-generator/
 COPY npm-shrinkwrap.json /opt/killrvideo-generator/
-    
+
 # Add dependencies for node-gyp, then run npm install and remove dependencies
 RUN set -x \
     && apt-get update \

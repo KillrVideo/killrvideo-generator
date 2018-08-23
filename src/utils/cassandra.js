@@ -1,8 +1,8 @@
 import Promise from 'bluebird';
 import config from 'config';
-import { Client, auth, types as CassandraTypes } from 'dse-driver';
-import { logger } from './logging';
-import { lookupServiceAsync } from './lookup-service';
+import {auth, Client, types as CassandraTypes} from 'dse-driver';
+import {logger} from './logging';
+import {lookupServiceAsync} from './lookup-service';
 
 /**
  * An array of CQL table strings to use for the schema.
@@ -66,14 +66,14 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
         clientOpts.keyspace = keyspace;
       }
 
-       /** 
-       * Check for both KILLRVIDEO_DSE_USERNAME and KILLRVIDEO_DSE_PASSWORD environment
-       * variables.  If they both exist use the values set within them.  If not,
-       * use default values for authentication.
-       */
+      /**
+      * Check for both KILLRVIDEO_DSE_USERNAME and KILLRVIDEO_DSE_PASSWORD environment
+      * variables.  If they both exist use the values set within them.  If not,
+      * use default values for authentication.
+      */
       if (dseUsername && dsePassword) {
         let passwordLength = dsePassword.length;
-        logger.info('Using supplied DSE username: "' + dseUsername + '" and password: "***' + dsePassword.substring(passwordLength - 4, passwordLength) + '" from environment variables')
+        logger.info('Using supplied DSE username: "' + dseUsername + '" and password: "***' + dsePassword.substring(passwordLength - 4, passwordLength) + '" from environment variables');
 
         // Use the values passed in from the config
         clientOpts.authProvider = new auth.DsePlainTextAuthProvider(dseUsername, dsePassword);
@@ -81,7 +81,30 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
       } else {
         logger.info('No detected username/password combination was passed in. DSE cluster authentication method was NOT executed.');
       }
-      
+
+      let Filesystem = require("fs");
+      let sslStat = process.env.KILLRVIDEO_ENABLE_SSL;
+      logger.info(sslStat);
+
+      if (sslStat === "true") {
+        logger.info('SSL is configured to be on.');
+        if (Filesystem.existsSync('cassandra.cert')) {
+          clientOpts.sslOptions = {
+            ca: [Filesystem.readFileSync('cassandra.cert')],
+            // validate server cert and reject if not trusted
+            requestCert: true,
+            rejectUnauthorized: true
+          };
+          logger.info('Found cert, read file sync.')
+        } else {
+          logger.info('No cert found, SSL not enabled.')
+        }
+      } else if (sslStat === "false") {
+        logger.info('SSL is configured to be off.')
+      } else {
+        logger.info('SSL is not configured, should it be set?')
+      }
+
       // Create a client and promisify it
       let client = new Client(clientOpts);
       client = Promise.promisifyAll(client);
@@ -96,8 +119,7 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
   
   clientPromises.set(keyspace, promise);
   return promise;
-};
-
+}
 /**
  * Creates a keyspace in Cassandra if it doesn't already exist. Pass the name of the keyspace and the
  * string to be used as the REPLICATION setting (i.e. after WITH REPLIACTION = ...).
@@ -108,8 +130,7 @@ function createKeyspaceIfNotExistsAsync(keyspace, replication, dseUsername, dseP
   
   // Get a client, then create the keyspace
   return getCassandraClientAsync(null, dseUsername, dsePassword).then(client => client.executeAsync(cql));
-};
-
+}
 /**
  * Create the tables if they don't already exist.
  */
@@ -129,8 +150,7 @@ export function getCassandraClient() {
     throw new Error('No client instance found. Did you forget to call initCassandraAsync?');
   }
   return clientInstance;
-};
-
+}
 /**
  * Initializes the Cassandra keyspace and schema needed.
  */
@@ -145,4 +165,4 @@ export async function initCassandraAsync() {
 
   // Save client instance
   clientInstance = client;
-};
+}
