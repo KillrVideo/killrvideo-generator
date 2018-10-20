@@ -4,6 +4,10 @@ import {auth, Client, types as CassandraTypes} from 'dse-driver';
 import {logger} from './logging';
 import {lookupServiceAsync} from './lookup-service';
 
+const dse = require('dse-driver');
+const DCAwareRoundRobinPolicy = dse.policies.loadBalancing.DCAwareRoundRobinPolicy;
+const ConstantSpeculativeExecutionPolicy = dse.policies.speculativeExecution.ConstantSpeculativeExecutionPolicy;
+
 /**
  * An array of CQL table strings to use for the schema.
  */
@@ -58,7 +62,11 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
         contactPoints,
         queryOptions: { 
           prepare: true,
-          consistency: CassandraTypes.consistencies.localQuorum
+          consistency: CassandraTypes.consistencies.localOne
+        },
+        policies: {
+          loadBalancing: new DCAwareRoundRobinPolicy('onprem',3),
+          speculativeExecution: new ConstantSpeculativeExecutionPolicy(500,20)
         }
       };
       
@@ -104,6 +112,14 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
       } else {
         logger.info('SSL is not configured, should it be set?')
       }
+
+      /**
+      const localDatacenter = 'AWS';
+      const loadBalancingPolicy = DCAwareRoundRobinPolicy(localDatacenter);
+      clientOpts.policies = {
+        loadBalancing : loadBalancingPolicy
+      };
+      */
 
       // Create a client and promisify it
       let client = new Client(clientOpts);
