@@ -1,5 +1,5 @@
 # Key required for calling YouTube APIs
-youTubeApiKey: REPLACE_WITH_YOUR_KEY
+youTubeApiKey: AIzaSyCCSQlObM09uxZ6wcXVztqm4zeLtBZIAWo
 
 # Cassandra settings
 cassandra:
