@@ -1,3 +1,62 @@
-# No services specific to this project, instead just uses base services defined
-# in .\lib\killrvideo-docker-common\docker-compose.yaml 
-version: '2'
+version: '3'
+services:
+  # The KillrVideo Sample Data Generator
+  generator:
+    build: .
+    #image: killrvideo/killrvideo-generator
+    volumes:
+      - .:/opt/killrvideo-generator
+    ports:
+      - "5858:5858"
+    depends_on:
+      - dse
+      - backend
+    environment:
+      KILLRVIDEO_LOGGING_LEVEL: debug
+    command: "node --debug /opt/killrvideo-generator/dist/index.js"
+
+  # DataStax Enterprise
+  # start with search and graph modes enabled ("-s -g")
+  dse:
+    image: datastax/dse-server:6.0.0
+    command: [ -s -g ]
+    ports:
+    - "9042:9042"
+    - "8983:8983"
+    - "8182:8182"
+    environment:
+      DS_LICENSE: accept
+    # Allow DSE to lock memory with mlock
+    cap_add:
+    - IPC_LOCK
+    ulimits:
+      memlock: -1
+
+  # Container to load KillrVideo schema and search config into DSE
+  # Provides options to configure secure users as well
+  # Runs only once and exits
+  dse-config:
+    image: killrvideo/killrvideo-dse-config:2.2.1
+    depends_on:
+      - dse
+    environment:
+      KILLRVIDEO_SERVICE_DISCOVERY_DISABLED: 'true'
+
+  # The KillrVideo backend application used by the generator to submit sample data
+  backend:
+    image: hadesarchitect/killrvideo-nodejs:no-etcd
+    ports:
+      - "50101:50101"
+    depends_on:
+      - dse
+    environment:
+      KILLRVIDEO_LOGGING_LEVEL: debug
+
+#  studio:
+#    image: killrvideo/killrvideo-studio:2.0.0
+#    ports:
+#      - "9091:9091"
+#    depends_on:
+#      - dse
+#    environment:
+#      DS_LICENSE: accept
