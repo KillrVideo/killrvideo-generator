@@ -11,23 +11,20 @@ This app is packaged and distributed as a Docker container. The typical usage is
 
 ## Setting up a Development Environment
 
-After cloning the repo, first install all dependencies:
+After cloning the repo, first install all dependencies and build the project:
+```
+> docker-compose run --no-deps -e NODE_ENV=development generator npm install
+> docker-compose run --no-deps generator npm run build
+```
+
+If you have npm available locally, you may use it directly instead:
 ```
 > npm install
+> npm run build
 ```
-All environment dependencies can be spun up using `docker-compose` (i.e. Etcd and DataStax
-Enterprise). First you need to generate a `.env` file that contains information about your
-Docker environment.
 
-In Windows, from a Powershell command prompt run:
-```
-PS> .\lib\killrvideo-docker-common\create-environment.ps1
-```
-Or on Mac/Linux, run:
-```
-> ./lib/killrvideo-docker-common/create-environment.sh
-```
-You can then start those dependencies with:
+All environment dependencies can be spun up using `docker-compose` (i.e. Etcd and DataStax
+Enterprise). You can start those dependencies with:
 ```
 > docker-compose up -d
 ```
@@ -55,6 +52,10 @@ in `/dist`.
 If using VS Code for development, the tasks checked into the repo under `/.vscode` should 
 allow you to start the program with debugging using `F5`.
 
+By default docker-compose runs generator with debugger enabled and opens port 5858. You can use this to attach to the launched application to debug it.
+
+If you would like to use DataStax Studio to work directly with the database, please uncomment studio definition in ./docker-compose.yaml
+
 ## Releasing
 
 The app is released as a Docker image for use with the service project implementations.
@@ -70,3 +71,26 @@ Docker image.
 We use Travis CI for doing continuous integration builds and it will use those scripts to 
 automatically publish any tagged Git commits to Docker Hub. You can, of course, manually
 build and publish Docker images with those scripts as well.
+
+## Known Issues
+
+### Error: Bad Request
+
+Generator repeatedly logs error:
+
+```
+generator_1   | 2019-01-18T13:37:35.543Z - error:  Error: Bad Request
+generator_1   |     at Request._callback (/opt/killrvideo-generator/node_modules/google-auth-library/lib/transporters.js:85:15)
+```
+
+The issue is ussually caused by unset youTubeApiKey. Check if you have set youTubeApiKey in config/local.yaml file and if it's still valid.
+
+### Could not initialize Cassandra 
+
+```
+generator_1   | 2019-01-18T13:46:21.015Z - debug:  NoHostAvailableError: All host(s) tried for query failed. First host tried, 172.26.0.2:9042: Error: connect ECONNREFUSED 172.26.0.2:9042. See innerErrors.
+...
+generator_1   | 2019-01-18T13:46:21.018Z - verbose: Could not initialize Cassandra. Retry 1 in 10000ms.
+```
+
+Start up of DSE/Cassandra takes noticeable time, so this error happens every time if you launch generator and DSE at the same time. Usually it can be ignored, but if connection takes too long time, please check if dse container running and check its logs.
