@@ -5,7 +5,7 @@ node_js:
 # Build the app and a docker image
 script:
 - npm run build
-- ./scripts/travis-build.sh
+- docker build -t killrvideo/killrvideo-generator:${TRAVIS_COMMIT} --build-arg KILLRVIDEO_YOUTUBE_API_KEY=$KILLRVIDEO_YOUTUBE_API_KEY .
 
 # If successful, see if we need to publish also
 after_success:
