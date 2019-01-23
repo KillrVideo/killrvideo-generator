@@ -5,11 +5,13 @@ node_js:
 # Build the app and a docker image
 script:
 - npm run build
-- docker build -t killrvideo/killrvideo-generator:${TRAVIS_COMMIT} --build-arg KILLRVIDEO_YOUTUBE_API_KEY=$KILLRVIDEO_YOUTUBE_API_KEY .
+- docker build -t ${TRAVIS_COMMIT} --build-arg KILLRVIDEO_YOUTUBE_API_KEY=$KILLRVIDEO_YOUTUBE_API_KEY .
 
 # If successful, see if we need to publish also
 after_success:
-- ./scripts/travis-publish.sh
+- docker tag ${TRAVIS_COMMIT} killrvideo/killrvideo-generator:${TRAVIS_TAG}
+- docker login -u $DOCKER_USER -p $DOCKER_PASS
+- docker push killrvideo/killrvideo-generator:${TRAVIS_TAG}
 
 # Sudo required for doing docker build
 sudo: required
