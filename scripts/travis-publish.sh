@@ -6,12 +6,6 @@ if [ -z "TRAVIS_TAG" ]; then
   exit 0
 fi
 
-# This script assumes the following environment variables are present
-if [[ -z "$DOCKER_USER" ]] || [[ -z "$DOCKER_PASS" ]]; then
-  echo "DOCKER_USER or DOCKER_PASS not set"
-  exit 1
-fi
-
 set -xue # Print debug output, fail on empty env vars, exit on errors
 
 DOCKER_IMAGE=killrvideo/killrvideo-generator
