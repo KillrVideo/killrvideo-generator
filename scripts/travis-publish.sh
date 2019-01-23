@@ -18,10 +18,10 @@ if [ -z "$CURRENT_TAG" ]; then
   exit 0
 fi
 
-docker tag ${DOCKER_IMAGE}:${TAGHASH} $CURRENT_TAG
+docker tag ${DOCKER_IMAGE}:${TAGHASH} ${DOCKER_IMAGE}:${CURRENT_TAG}
 
 echo "Publishing $DOCKER_IMAGE for git tag $CURRENT_TAG"
 
 # Login to Docker and push the image which should have been built
-set +x; docker login -u $DOCKER_USER -p $DOCKER_PASS; set -x
-docker push $DOCKER_IMAGE:$CURRENT_TAG
+docker login -u $DOCKER_USER -p $DOCKER_PASS
+docker push ${DOCKER_IMAGE}:${CURRENT_TAG}
