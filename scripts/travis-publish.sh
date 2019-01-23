@@ -1,13 +1,27 @@
 #!/bin/bash
 
-set -e # Exit with nonzero exit code if anything fails
+set -xue # Print debug output, fail on empty env vars, exit on errors
 
-# If a pull request
-if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then 
-  echo "Skipping publish for pull request"
+# This script assumes the following environment variables are present
+if [[ -z "$DOCKER_USER" ]] || [[ -z "$DOCKER_PASS" ]]; then
+  echo "DOCKER_USER or DOCKER_PASS not set"
+  exit 1
+fi
+
+DOCKER_IMAGE=killrvideo/killrvideo-generator
+TAGHASH=`git log -1 --pretty=format:%h`
+set +e; CURRENT_TAG=`git describe --tags --exact-match 2> /dev/null`; set -e
+
+# Only allow publish for tags
+if [ -z "$CURRENT_TAG" ]; then
+  echo "Current commit is not for a tag, skipping publish"
   exit 0
 fi
 
-# Invoke the publish script
-MY_PATH="`dirname \"$0\"`"
-( exec "$MY_PATH/docker-publish.sh" )
+docker tag ${DOCKER_IMAGE}:${TAGHASH} $CURRENT_TAG
+
+echo "Publishing $DOCKER_IMAGE for git tag $CURRENT_TAG"
+
+# Login to Docker and push the image which should have been built
+set +x; docker login -u $DOCKER_USER -p $DOCKER_PASS; set -x
+docker push $DOCKER_IMAGE:$CURRENT_TAG
