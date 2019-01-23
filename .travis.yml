@@ -9,6 +9,7 @@ script:
 
 # If successful, see if we need to publish also
 after_success:
+- test $TRAVIS_TAG = "" && travis_terminate 0 
 - docker tag ${TRAVIS_COMMIT} killrvideo/killrvideo-generator:${TRAVIS_TAG}
 - docker login -u $DOCKER_USER -p $DOCKER_PASS
 - docker push killrvideo/killrvideo-generator:${TRAVIS_TAG}
