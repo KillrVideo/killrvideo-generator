@@ -19,6 +19,7 @@ COPY npm-shrinkwrap.json /opt/killrvideo-generator/
 
 # Add dependencies for node-gyp, then run npm install and remove dependencies
 RUN set -x \
+    && printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list \
     && apt-get update \
     && apt-get install -y python \
                           make \
