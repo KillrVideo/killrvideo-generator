@@ -25,10 +25,10 @@ schedules:
   - every 20 seconds
 
   addSampleUser:
-  - every 30 minutes
+  - every 10 minutes
 
   addSampleVideo:
-  - every 8 hours
+  - every 10 minutes
 
   addSampleVideoView:
   - every 1 seconds
