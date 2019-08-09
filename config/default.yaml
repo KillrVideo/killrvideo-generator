@@ -1,5 +1,5 @@
 # Key required for calling YouTube APIs
-youTubeApiKey: REPLACE_WITH_YOUR_KEY
+youTubeApiKey: REPLACE_WITH_YOUR_KEY_IN config/local.yaml
 
 # Cassandra settings
 cassandra:
@@ -25,10 +25,23 @@ schedules:
   - every 20 seconds
 
   addSampleUser:
-  - every 30 minutes
+  - every 10 minutes
 
   addSampleVideo:
-  - every 8 hours
+  - every 10 minutes
 
   addSampleVideoView:
   - every 1 seconds
+
+services:
+  web:                    ['web:3000']
+  cassandra:              ['dse:9042']
+  dse-search:             ['dse:8983']
+  UploadsService:         ['backend:50101']
+  RatingsService:         ['backend:50101']
+  CommentsService:        ['backend:50101']
+  SearchService:          ['backend:50101']
+  StatisticsService:      ['backend:50101']
+  VideoCatalogService:    ['backend:50101']
+  UserManagementService:  ['backend:50101']
+  SuggestedVideoService:  ['backend:50101']

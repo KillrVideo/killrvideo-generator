@@ -1,11 +1,12 @@
 {
   "name": "killrvideo-generator",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Sample Data generator for KillrVideo",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
     "start:dev": "cross-env NODE_ENV=development node --debug -r dotenv/config dist/index.js",
+    "debug": "node --debug dist/index.js",
     "clean": "rimraf dist",
     "build": "npm-run-all --parallel \"build:*\"",
     "build:js": "babel src --out-dir dist --source-maps",

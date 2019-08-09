@@ -2,7 +2,7 @@ FROM node:6.11-slim
 
 # Add killrvideo group and user
 RUN groupadd -r killrvideo --gid=999 \
-    && useradd -r -g killrvideo --uid=999 killrvideo
+    && useradd -m -r -g killrvideo --uid=999 killrvideo
 
 # Default to production environment
 ENV NODE_ENV production
@@ -19,6 +19,7 @@ COPY npm-shrinkwrap.json /opt/killrvideo-generator/
 
 # Add dependencies for node-gyp, then run npm install and remove dependencies
 RUN set -x \
+    && printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list \
     && apt-get update \
     && apt-get install -y python \
                           make \
