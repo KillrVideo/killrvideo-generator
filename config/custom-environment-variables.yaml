@@ -8,3 +8,6 @@ cassandra:
   dsePassword: KILLRVIDEO_DSE_PASSWORD
 
 loggingLevel: KILLRVIDEO_LOGGING_LEVEL
+
+services:
+  cassandra: KILLRVIDEO_DSE_CONTACT_POINTS
