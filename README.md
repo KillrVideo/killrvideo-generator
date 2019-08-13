@@ -33,9 +33,12 @@ Enterprise). You can start those dependencies with:
 
 The app generates sample video data to insert into KillrVideo by searching YouTube for videos matching keywords specified in `src/youtube/sources.js`. Calling the YouTube Data API requires  authentication, which for the generator is an API key. In order to run the generator from your local environment you will need to get an API key from the [Google Developer Console](https://console.developers.google.com/). 
 
-Create a new project, select it, and expand APIs and Auth. In the list of APIs, enable YouTube Data API (v3) and under credentials select to create a new browser key. Now create the file `config/local.yaml` and add your API key:
+Create a new project, select it, and expand APIs and Auth. In the list of APIs, enable YouTube Data API (v3) and under credentials select to create a new browser key. Now open the file `docker-compose.yaml` and add your API key:
  ```
-youTubeApiKey: <YOUR API KEY> 
+ services:
+  generator:
+    environment:
+      KILLRVIDEO_YOUTUBE_API_KEY: <YOUR API KEY> 
 ```
 
 ## Developing
@@ -54,7 +57,28 @@ allow you to start the program with debugging using `F5`.
 
 By default docker-compose runs generator with debugger enabled and opens port 5858. You can use this to attach to the launched application to debug it.
 
-If you would like to use DataStax Studio to work directly with the database, please uncomment studio definition in ./docker-compose.yaml
+## Environment Variables
+
+To change behaviour of the application you can configure environment variables in docker-compose file. For example, you can configure the application to work with your own cassandra cluster instead of the 'built-in' dockerized one. Add the variable to a docker-compose file like here:
+```
+version: '3'
+services:
+  generator:
+    ...
+    environment:
+      KILLRVIDEO_DSE_CONTACT_POINTS: 192.168.15.17
+```
+
+### Available Environment Variables
+```
+Logging Level       KILLRVIDEO_LOGGING_LEVEL          verbose
+YouTube API Key     KILLRVIDEO_YOUTUBE_API_KEY        REPLACE_WITH_YOUR_KEY
+Cassandra Host      KILLRVIDEO_DSE_CONTACT_POINTS     dse
+Replication Factor  KILLRVIDEO_CASSANDRA_REPLICATION  "{ 'class' : 'SimpleStrategy', 'replication_factor' : 1 }"
+Generator Keyspace  KILLRVIDEO_CASSANDRA_KEYSPACE     killrvideo_sample_data
+Username            KILLRVIDEO_DSE_USERNAME           Null
+Password            KILLRVIDEO_DSE_PASSWORD           Null
+````
 
 ## Releasing
 
