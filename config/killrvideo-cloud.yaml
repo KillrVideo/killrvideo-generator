@@ -11,7 +11,7 @@ schedules:
   - every 30 minutes
 
   addSampleVideo: 
-  - every 30 seconds
+  - every 300 seconds
 
   addSampleVideoView:
   - every 1 seconds
