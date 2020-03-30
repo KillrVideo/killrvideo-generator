@@ -4,7 +4,7 @@ import { getYouTubeClient } from './client';
 import { getCassandraClient } from '../utils/cassandra';
 
 const MAX_VIDEOS_PER_REQUEST = 50;
-const MAX_VIDEOS_PER_REFRESH = 300;
+const MAX_VIDEOS_PER_REFRESH = 50;
 
 const INSERT_VIDEO_CQL = 'INSERT INTO youtube_videos (sourceid, published_at, youtube_video_id, name, description) VALUES (?, ?, ?, ?, ?)';
 
